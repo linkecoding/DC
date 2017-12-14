@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_file_list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorLightGray"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorWhite">
+    <TextView
+        android:id="@+id/id_start_search"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_margin="10dp"
+        android:drawableLeft="@drawable/ic_search_24dp"
+        android:drawableStart="@drawable/ic_search_24dp"
+        android:background="@color/colorLightGray"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingStart="10dp"
+        android:drawablePadding="10dp"
+        android:gravity="start|center"
+        android:text="@string/str_search"/>
+
+    </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorLightGray">
+        <TextView
+            android:id="@+id/id_now_file_path_tv"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:paddingEnd="10dp"
+            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
+            android:background="@color/colorWhite"
+            android:text="moer"
+            android:textSize="14sp" />
+    </FrameLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorLightGray"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+    <ListView
+        android:id="@+id/id_file_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/colorLightGray"
+        android:dividerHeight="1dp"/>
+          <TextView
+              android:id="@+id/id_empty_view"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_margin="10dp"
+              android:drawablePadding="10dp"
+              android:drawableTop="@drawable/ic_folder"
+              android:layout_gravity="center"
+              android:text="@string/str_no_file"/>
+    </FrameLayout>
+</LinearLayout>
