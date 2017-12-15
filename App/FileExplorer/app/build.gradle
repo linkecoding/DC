@@ -4,7 +4,7 @@ android {
     buildToolsVersion "27.0.2"
     defaultConfig {
         applicationId "com.codekong.fileexplorer"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -31,4 +31,5 @@ dependencies {
     implementation 'com.android.support:design:27.0.2'
     implementation 'net.qiujuer.genius:ui:2.0.0'
     implementation 'net.qiujuer.genius:res:2.0.0'
+    implementation 'com.jwenfeng.pulltorefresh:library:1.0.1'
 }

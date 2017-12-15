@@ -1,5 +1,8 @@
 package com.codekong.fileexplorer.util;
 
+import android.os.Handler;
+import android.os.Message;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
@@ -14,6 +17,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by szh on 2017/2/8.
@@ -216,76 +221,84 @@ public class FileUtils {
      * @param categorySuffix key--对应类型,value-对应该类别的后缀集合
      * @return
      */
-    public static Map<String, Integer> scanCountFile(String path, Map<String, Set<String>> categorySuffix) {
-        File file = new File(path);
+    public static void scanCountFile(String path, final Map<String, Set<String>> categorySuffix, final Handler handler) {
+        final File file = new File(path);
 
         //非目录或者目录不存在直接返回
         if (!file.exists() || file.isFile()) {
-            return null;
-        }
-        Map<String, Integer> countRes = new HashMap<>(categorySuffix.size());
-        for (String category : categorySuffix.keySet()) {
-            //将最后统计结果的key设置为类别
-            countRes.put(category, 0);
+            return;
         }
 
-
-        LinkedList<File> linkedList = new LinkedList<>();
-        File[] files = file.listFiles(new FilenameFilter() {
+        final ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
+        singleExecutor.submit(new Runnable() {
             @Override
-            public boolean accept(File file, String s) {
-                //过滤掉隐藏文件
-                return !file.getName().startsWith(".");
-            }
-        });
-
-        for (File f : files) {
-            if (f.isDirectory()) {
-                //把目录添加进队列
-                linkedList.add(f);
-            } else {
-                //找到该文件所属的类别
-                for (Map.Entry<String, Set<String>> entry : categorySuffix.entrySet()) {
-                    //获取文件后缀
-                    String suffix = f.getName().substring(f.getName().indexOf(".") + 1).toLowerCase();
-                    //找到了
-                    if (entry.getValue().contains(suffix)) {
-                        countRes.put(entry.getKey(), countRes.get(entry.getKey()) + 1);
-                        break;
+            public void run() {
+                Map<String, Integer> countRes = new HashMap<>(categorySuffix.size());
+                for (String category : categorySuffix.keySet()) {
+                    //将最后统计结果的key设置为类别
+                    countRes.put(category, 0);
+                }
+                LinkedList<File> linkedList = new LinkedList<>();
+                File[] files = file.listFiles(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File file, String s) {
+                        //过滤掉隐藏文件
+                        return !file.getName().startsWith(".");
                     }
-                }
-            }
-        }
+                });
 
-        File tmpFile = null;
-        while (!linkedList.isEmpty()) {
-            //队头出队列
-            tmpFile = linkedList.removeFirst();
-            files = tmpFile.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File file, String s) {
-                    //过滤掉隐藏文件
-                    return !file.getName().startsWith(".");
-                }
-            });
-            for (File f : files) {
-                if (f.isDirectory()) {
-                    //把目录添加进队列
-                    linkedList.add(f);
-                } else {
-                    //找到该文件所属的类别
-                    for (Map.Entry<String, Set<String>> entry : categorySuffix.entrySet()) {
-                        //获取文件后缀
-                        String suffix = f.getName().substring(f.getName().indexOf(".") + 1).toLowerCase();
-                        //找到了
-                        if (entry.getValue().contains(suffix)) {
-                            countRes.put(entry.getKey(), countRes.get(entry.getKey()) + 1);
-                            break;
+                for (File f : files) {
+                    if (f.isDirectory()) {
+                        //把目录添加进队列
+                        linkedList.add(f);
+                    } else {
+                        //找到该文件所属的类别
+                        for (Map.Entry<String, Set<String>> entry : categorySuffix.entrySet()) {
+                            //获取文件后缀
+                            String suffix = f.getName().substring(f.getName().indexOf(".") + 1).toLowerCase();
+                            //找到了
+                            if (entry.getValue().contains(suffix)) {
+                                countRes.put(entry.getKey(), countRes.get(entry.getKey()) + 1);
+                                break;
+                            }
                         }
                     }
                 }
+
+                File tmpFile = null;
+                while (!linkedList.isEmpty()) {
+                    //队头出队列
+                    tmpFile = linkedList.removeFirst();
+                    files = tmpFile.listFiles(new FilenameFilter() {
+                        @Override
+                        public boolean accept(File file, String s) {
+                            //过滤掉隐藏文件
+                            return !file.getName().startsWith(".");
+                        }
+                    });
+                    for (File f : files) {
+                        if (f.isDirectory()) {
+                            //把目录添加进队列
+                            linkedList.add(f);
+                        } else {
+                            //找到该文件所属的类别
+                            for (Map.Entry<String, Set<String>> entry : categorySuffix.entrySet()) {
+                                //获取文件后缀
+                                String suffix = f.getName().substring(f.getName().indexOf(".") + 1).toLowerCase();
+                                //找到了
+                                if (entry.getValue().contains(suffix)) {
+                                    countRes.put(entry.getKey(), countRes.get(entry.getKey()) + 1);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Message msg = Message.obtain();
+                msg.obj = countRes;
+                handler.sendMessage(msg);
             }
-        }
-        return countRes;
+        });
     }
 }

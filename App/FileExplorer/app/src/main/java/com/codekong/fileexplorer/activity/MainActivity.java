@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
@@ -28,10 +27,6 @@ import com.codekong.fileexplorer.view.OperationMenuPopupWindow;
 import com.codekong.fileexplorer.view.SortMenuPopupWindow;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -203,23 +198,7 @@ public class MainActivity extends BaseActivity {
         sortMenuPopupWindow.setOnSortItemClickListener(new SortMenuPopupWindow.OnSortItemClickListener() {
             @Override
             public void closeMenu() {
-                final Map<String, Set<String>> map = new HashMap<>();
-                Set<String> set = new HashSet<>();
-                set.add("mp4");
-                set.add("avi");
-                map.put("video", set);
-                MainActivity.this.closeMenu(sortMenuPopupWindow);
-                Log.e(TAG, "开始统计");
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Map<String, Integer> stringIntegerMap = FileUtils.scanCountFile(Environment.getExternalStorageDirectory().getAbsolutePath(), map);
-
-                        for (Map.Entry<String, Integer> entry : stringIntegerMap.entrySet()){
-                            Log.e(TAG, "统计结果" + entry.getValue());
-                        }
-                    }
-                }).start();
+               MainActivity.this.closeMenu(sortMenuPopupWindow);
             }
 
             @Override

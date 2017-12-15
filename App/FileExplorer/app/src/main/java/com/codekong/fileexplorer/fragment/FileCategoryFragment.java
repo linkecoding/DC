@@ -1,11 +1,16 @@
 package com.codekong.fileexplorer.fragment;
 
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -14,9 +19,13 @@ import com.codekong.fileexplorer.adapter.CommonAdapter;
 import com.codekong.fileexplorer.adapter.ViewHolder;
 import com.codekong.fileexplorer.bean.Category;
 import com.codekong.fileexplorer.config.Constant;
+import com.codekong.fileexplorer.util.FileUtils;
+import com.jwenfeng.library.pulltorefresh.BaseRefreshListener;
+import com.jwenfeng.library.pulltorefresh.PullToRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,8 +40,33 @@ public class FileCategoryFragment extends Fragment {
     TextView mStartSearchBtn;
     @BindView(R.id.id_category_grid_view)
     GridView mCategoryGridView;
+    @BindView(R.id.id_loading_framelayout)
+    FrameLayout mLoadingFrameLayout;
+    @BindView(R.id.id_file_category_pulltorefresh)
+    PullToRefreshLayout mPullToRefreshLayout;
+
     //存放分类数据
     private List<Category> mCategoryData = new ArrayList<>();
+
+    //文件扫描结束的处理
+    private Handler mHandler = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(Message msg) {
+            mCategoryData.clear();
+            mPullToRefreshLayout.finishRefresh();
+            Map<String, Integer> countRes = (Map<String, Integer>) msg.obj;
+            for (int i = 0; i < Constant.FILE_CATEGORY_ICON.length; i++) {
+                Category category = new Category();
+                category.setCategoryIcon(Constant.FILE_CATEGORY_ICON[i]);
+                category.setCategoryName(Constant.FILE_CATEGORY_NAME[i]);
+                category.setCategoryNums(countRes.get(Constant.FILE_CATEGORY_ICON[i].substring(3)) + "项");
+                mCategoryData.add(category);
+            }
+            mLoadingFrameLayout.setVisibility(View.GONE);
+            setData();
+        }
+    };
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -44,21 +78,27 @@ public class FileCategoryFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initData();
-        setData();
+        initEvent();
+        //扫描文件
+        scanFile();
     }
 
     /**
-     * 初始化一些数据(模拟)
+     * 初始化事件
      */
-    private void initData() {
-        for (int i = 0; i < Constant.FILE_CATEGORY_ICON.length; i++) {
-            Category category = new Category();
-            category.setCategoryIcon(Constant.FILE_CATEGORY_ICON[i]);
-            category.setCategoryName(Constant.FILE_CATEGORY_NAME[i]);
-            category.setCategoryNums(1 + "项");
-            mCategoryData.add(category);
-        }
+    private void initEvent() {
+        mPullToRefreshLayout.setCanLoadMore(false);
+        mPullToRefreshLayout.setRefreshListener(new BaseRefreshListener() {
+            @Override
+            public void refresh() {
+                scanFile();
+            }
+
+            @Override
+            public void loadMore() {
+
+            }
+        });
     }
 
     /**
@@ -83,5 +123,16 @@ public class FileCategoryFragment extends Fragment {
 
     public int getResId(String iconName){
         return getContext().getResources().getIdentifier(iconName, "drawable", getContext().getPackageName());
+    }
+
+    /**
+     * 扫描文件
+     */
+    private void scanFile(){
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+            return;
+        }
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+        FileUtils.scanCountFile(path, Constant.CATEGORY_SUFFIX, mHandler);
     }
 }

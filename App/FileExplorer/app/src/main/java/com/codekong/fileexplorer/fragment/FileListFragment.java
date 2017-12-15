@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,8 +19,11 @@ import android.widget.Toast;
 import com.codekong.fileexplorer.R;
 import com.codekong.fileexplorer.adapter.FileListAdapter;
 import com.codekong.fileexplorer.util.FileUtils;
+import com.jwenfeng.library.pulltorefresh.BaseRefreshListener;
+import com.jwenfeng.library.pulltorefresh.PullToRefreshLayout;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
@@ -43,6 +47,9 @@ public class FileListFragment extends Fragment implements AdapterView.OnItemClic
     ListView mFileListView;
     @BindView(R.id.id_empty_view)
     TextView mEmptyView;
+    @BindView(R.id.id_file_list_pulltorefresh)
+    PullToRefreshLayout mPullToRefreshLayout;
+
     private Unbinder mUnbinder;
     //文件列表数组
     private File[] mFilesArray;
@@ -72,8 +79,45 @@ public class FileListFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        initEvent();
         initData();
     }
+
+    /**
+     * 初始化事件
+     */
+    private void initEvent() {
+        mFileListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (firstVisibleItem != 0){
+                    disablePullToRefresh(mPullToRefreshLayout, false);
+                }else{
+                    disablePullToRefresh(mPullToRefreshLayout, true);
+                }
+            }
+        });
+
+        mPullToRefreshLayout.setCanLoadMore(false);
+        mPullToRefreshLayout.setRefreshListener(new BaseRefreshListener() {
+            @Override
+            public void refresh() {
+                initData();
+                mPullToRefreshLayout.finishRefresh();
+            }
+
+            @Override
+            public void loadMore() {
+
+            }
+        });
+    }
+
 
     /**
      * 初始化数据并显示
@@ -82,6 +126,7 @@ public class FileListFragment extends Fragment implements AdapterView.OnItemClic
         String fileNowPath = "";
         //对文件进行过滤和排序
         mFilesArray = FileUtils.filterSortFileByName(Environment.getExternalStorageDirectory().getPath(), true);
+        mFileList.clear();
         mFileList.addAll(Arrays.asList(mFilesArray));
         mRootPath = Environment.getExternalStorageDirectory().getPath();
         mNowPathStack = new Stack<>();
@@ -159,5 +204,24 @@ public class FileListFragment extends Fragment implements AdapterView.OnItemClic
             mNowPathStack.pop();
         }
         showChange(FileUtils.getNowStackPathString(mNowPathStack));
+    }
+
+    /**
+     * 通过反射禁用下拉刷新
+     * @param disable
+     */
+    private void disablePullToRefresh(PullToRefreshLayout pullToRefreshLayout, boolean disable){
+        Class<PullToRefreshLayout> pullToRefreshClass = PullToRefreshLayout.class;
+        try {
+            Field canRefreshField = pullToRefreshClass.getDeclaredField("canRefresh");
+            canRefreshField.setAccessible(true);
+            canRefreshField.set(pullToRefreshLayout, disable);
+            canRefreshField.setAccessible(false);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
     }
 }

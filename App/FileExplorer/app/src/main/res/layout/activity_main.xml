@@ -30,6 +30,10 @@
             android:layout_marginEnd="10dp"
             android:visibility="gone"/>
     </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/colorGray"/>
     <android.support.v4.view.ViewPager
         android:id="@+id/id_switch_view_pager"
         android:layout_width="match_parent"
@@ -41,7 +45,7 @@
         android:background="@color/colorWhite">
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="1px"
             android:background="@color/colorGray"/>
     </FrameLayout>
 </LinearLayout>
