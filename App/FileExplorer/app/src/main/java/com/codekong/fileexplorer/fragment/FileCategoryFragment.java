@@ -52,7 +52,7 @@ public class FileCategoryFragment extends Fragment {
      * 初始化一些数据(模拟)
      */
     private void initData() {
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < Constant.FILE_CATEGORY_ICON.length; i++) {
             Category category = new Category();
             category.setCategoryIcon(Constant.FILE_CATEGORY_ICON[i]);
             category.setCategoryName(Constant.FILE_CATEGORY_NAME[i]);
@@ -65,7 +65,7 @@ public class FileCategoryFragment extends Fragment {
      * 设置数据
      */
     private void setData() {
-        CommonAdapter<Category> mAdapter = new CommonAdapter<Category>(this.getContext(), mCategoryData, R.layout.category_item) {
+       CommonAdapter<Category> mAdapter = new CommonAdapter<Category>(this.getContext(), mCategoryData, R.layout.category_item) {
             @Override
             public void convert(ViewHolder helper, Category item) {
                 helper.setImageResource(R.id.id_category_icon, getResId(item.getCategoryIcon()));

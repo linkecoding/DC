@@ -22,11 +22,10 @@ public class Constant {
 
     /*************************文件分类****************************/
     public static final String[] FILE_CATEGORY_NAME = {"视频", "文档", "图片", "音乐", "安装包", "压缩包",
-    "收藏夹", "蓝牙", "下载", "小米云盘", "远程管理", "热门表情"};
+    "下载"};
 
     public static final String[] FILE_CATEGORY_ICON = {"ic_video", "ic_document", "ic_picture", "ic_music",
-    "ic_apk", "ic_zip", "ic_favorites", "ic_bluetooth", "ic_download", "ic_cloud_disk",
-    "ic_remote_manage", "ic_popular_expression"};
+    "ic_apk", "ic_zip", "ic_download"};
     /*************************文件分类****************************/
 
 }
