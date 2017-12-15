@@ -1,12 +1,12 @@
 package com.codekong.fileexplorer.fragment;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,18 +24,23 @@ import com.jwenfeng.library.pulltorefresh.BaseRefreshListener;
 import com.jwenfeng.library.pulltorefresh.PullToRefreshLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
 
 /**
  * Created by szh on 2017/2/9.
  * 文件类别Fragment
  */
 
-public class FileCategoryFragment extends Fragment {
+public class FileCategoryFragment extends BaseFragment implements EasyPermissions.PermissionCallbacks {
+    private static final int REQUEST_CODE_EXTERNAL_STORAGE = 0X01;
+
     @BindView(R.id.id_start_search)
     TextView mStartSearchBtn;
     @BindView(R.id.id_category_grid_view)
@@ -67,6 +72,11 @@ public class FileCategoryFragment extends Fragment {
         }
     };
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -76,11 +86,21 @@ public class FileCategoryFragment extends Fragment {
     }
 
     @Override
+    protected void loadData() {
+        if (!EasyPermissions.hasPermissions(FileCategoryFragment.this.getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            EasyPermissions.requestPermissions(this,"需要读取文件目录",
+                    REQUEST_CODE_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }else {
+            //已经授权
+            initEvent();
+            //扫描文件
+            scanFile();
+        }
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initEvent();
-        //扫描文件
-        scanFile();
     }
 
     /**
@@ -134,5 +154,27 @@ public class FileCategoryFragment extends Fragment {
         }
         String path = Environment.getExternalStorageDirectory().getAbsolutePath();
         FileUtils.scanCountFile(path, Constant.CATEGORY_SUFFIX, mHandler);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        initEvent();
+        //扫描文件
+        scanFile();
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this,
+                Collections.singletonList(Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
+            new AppSettingsDialog.Builder(this).build().show();
+        }
     }
 }

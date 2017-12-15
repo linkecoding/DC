@@ -126,6 +126,7 @@ public class FileUtils {
             //显示隐藏文件
             fileArray = new File(path).listFiles();
         }
+
         //文件排序
         Arrays.sort(fileArray, new Comparator<File>() {
             @Override

@@ -33,9 +33,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity{
     private static final String TAG = "MainActivity";
-    
     @BindView(R.id.id_more_operation)
     ImageView mMoreOperation;
     @BindView(R.id.id_switch_tab_layout)
@@ -55,7 +54,6 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mUnbinder = ButterKnife.bind(this);
-
         initView();
     }
 

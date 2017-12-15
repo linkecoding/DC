@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,7 @@ import butterknife.Unbinder;
  * 文件列表Fragment
  */
 
-public class FileListFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class FileListFragment extends BaseFragment implements AdapterView.OnItemClickListener {
     @BindView(R.id.id_start_search)
     TextView mStartSearch;
     @BindView(R.id.id_now_file_path_tv)
@@ -65,7 +64,6 @@ public class FileListFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -77,10 +75,14 @@ public class FileListFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    protected void loadData() {
         initEvent();
         initData();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     /**
@@ -222,6 +224,5 @@ public class FileListFragment extends Fragment implements AdapterView.OnItemClic
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-
     }
 }
