@@ -19,7 +19,7 @@ import com.codekong.fileexplorer.adapter.CommonAdapter;
 import com.codekong.fileexplorer.adapter.ViewHolder;
 import com.codekong.fileexplorer.bean.Category;
 import com.codekong.fileexplorer.config.Constant;
-import com.codekong.fileexplorer.util.FileUtils;
+import com.codekong.fileexplorer.util.ScanFileCountUtil;
 import com.jwenfeng.library.pulltorefresh.BaseRefreshListener;
 import com.jwenfeng.library.pulltorefresh.PullToRefreshLayout;
 
@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,12 +62,12 @@ public class FileCategoryFragment extends BaseFragment implements EasyPermission
         public void handleMessage(Message msg) {
             mCategoryData.clear();
             mPullToRefreshLayout.finishRefresh();
-            Map<String, Integer> countRes = (Map<String, Integer>) msg.obj;
+            Map<String, AtomicInteger> countRes = (Map<String, AtomicInteger>) msg.obj;
             for (int i = 0; i < Constant.FILE_CATEGORY_ICON.length; i++) {
                 Category category = new Category();
                 category.setCategoryIcon(Constant.FILE_CATEGORY_ICON[i]);
                 category.setCategoryName(Constant.FILE_CATEGORY_NAME[i]);
-                category.setCategoryNums(countRes.get(Constant.FILE_CATEGORY_ICON[i].substring(3)) + "项");
+                category.setCategoryNums(countRes.get(Constant.FILE_CATEGORY_ICON[i].substring(3)).get() + "项");
                 mCategoryData.add(category);
             }
             mLoadingFrameLayout.setVisibility(View.GONE);
@@ -152,8 +155,21 @@ public class FileCategoryFragment extends BaseFragment implements EasyPermission
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
             return;
         }
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-        FileUtils.scanCountFile(path, Constant.CATEGORY_SUFFIX, mHandler);
+        final String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+
+        //单一线程线程池
+        ExecutorService singleExecutorService = Executors.newSingleThreadExecutor();
+        singleExecutorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                ScanFileCountUtil scanFileCountUtil = new ScanFileCountUtil
+                        .Builder(mHandler)
+                        .setFilePath(path)
+                        .setCategorySuffix(Constant.CATEGORY_SUFFIX)
+                        .create();
+                scanFileCountUtil.scanCountFile();
+            }
+        });
     }
 
     @Override
