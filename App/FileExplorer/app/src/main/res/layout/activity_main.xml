@@ -12,7 +12,8 @@
         android:layout_height="@dimen/len_44">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/len_44">
+            android:layout_height="@dimen/len_44"
+            android:visibility="gone">
             <Button
                 android:layout_width="@dimen/len_48"
                 android:layout_height="@dimen/len_28"
@@ -43,7 +44,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/len_44"
-        android:visibility="gone">
+        android:visibility="visible">
         <android.support.design.widget.TabLayout
             android:id="@+id/id_switch_tab_layout"
             android:layout_width="300dp"

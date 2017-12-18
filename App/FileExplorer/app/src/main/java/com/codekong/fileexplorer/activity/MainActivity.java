@@ -1,33 +1,16 @@
 package com.codekong.fileexplorer.activity;
 
-import android.content.DialogInterface;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.codekong.fileexplorer.R;
 import com.codekong.fileexplorer.adapter.SwitchViewPagerAdapter;
 import com.codekong.fileexplorer.base.BaseActivity;
-import com.codekong.fileexplorer.fragment.FileListFragment;
-import com.codekong.fileexplorer.util.FileUtils;
 import com.codekong.fileexplorer.util.ViewUtils;
-import com.codekong.fileexplorer.view.OperationMenuPopupWindow;
-import com.codekong.fileexplorer.view.SortMenuPopupWindow;
-
-import java.io.File;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
@@ -49,7 +32,7 @@ public class MainActivity extends BaseActivity {
     protected void initWidget() {
         super.initWidget();
         //设置状态栏的白底黑字
-        ViewUtils.MIUISetStatusBarLightMode(getWindow(), true);
+        ViewUtils.miuiSetStatusBarLightMode(getWindow(), true);
         SwitchViewPagerAdapter switchViewPagerAdapter = new SwitchViewPagerAdapter(this, getSupportFragmentManager());
         mSwitchViewPager.setAdapter(
                 switchViewPagerAdapter);
@@ -65,8 +48,9 @@ public class MainActivity extends BaseActivity {
             public void onPageSelected(int position) {
                 mCurrentFragmentPosition = position;
                 if (position == 1) {
+                    //只在文件列表页面显示按钮
                     mMoreOperation.setVisibility(View.VISIBLE);
-                } else if (position == 0) {
+                } else {
                     mMoreOperation.setVisibility(View.GONE);
                 }
             }
@@ -76,145 +60,5 @@ public class MainActivity extends BaseActivity {
 
             }
         });
-    }
-
-    @OnClick(R.id.id_more_operation)
-    public void onClick() {
-        final OperationMenuPopupWindow operationMenuPopupWindow = new OperationMenuPopupWindow(this.getSupportFragmentManager().getFragments().get(mCurrentFragmentPosition));
-        operationMenuPopupWindow.showAtLocation(findViewById(R.id.id_main_activity), Gravity.TOP, 0, 0);
-        operationMenuPopupWindow.setOnWindowItemClickListener(new OperationMenuPopupWindow.OnWindowItemClickListener() {
-            @Override
-            public void closeMenu() {
-                MainActivity.this.closeMenu(operationMenuPopupWindow);
-            }
-
-            @Override
-            public void sort(String path) {
-                MainActivity.this.closeMenu(operationMenuPopupWindow);
-                showSortMethodMenu();
-            }
-
-            @Override
-            public void newFolder(final String path) {
-                MainActivity.this.closeMenu(operationMenuPopupWindow);
-                final View view = (LinearLayout) getLayoutInflater().inflate(R.layout.input_layout, null);
-                //新文件名输入框
-                final EditText et = view.findViewById(R.id.id_input_ed);
-                //自定义弹出框标题
-                final TextView titleTv = new TextView(MainActivity.this);
-                titleTv.setText(MainActivity.this.getString(R.string.str_new_folder));
-                titleTv.setTextSize(16);
-                titleTv.setGravity(Gravity.CENTER_HORIZONTAL);
-                new AlertDialog.Builder(MainActivity.this)
-                        .setView(view)
-                        .setCancelable(false)
-                        .setPositiveButton(MainActivity.this.getString(R.string.str_new_create), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (!TextUtils.isEmpty(et.getText())) {
-                                    File file = new File(path, et.getText().toString());
-                                    if (!file.exists()) {
-                                        if (file.mkdirs()) {
-                                            //创建文件夹成功,刷新目录显示
-                                            MainActivity.this.refreshDirectory(path, true);
-                                            Toast.makeText(MainActivity.this, getString(R.string.str_folder_create_success), Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            Toast.makeText(MainActivity.this, getString(R.string.str_folder_create_failed), Toast.LENGTH_SHORT).show();
-                                        }
-                                    } else {
-                                        //文件夹已经存在
-                                        Toast.makeText(MainActivity.this, getString(R.string.str_folder_exist), Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            }
-                        })
-                        .setNegativeButton(MainActivity.this.getString(R.string.str_cancel), null)
-                        .show();
-            }
-
-            @Override
-            public void showHideFolder(String path, boolean showHideFile) {
-                MainActivity.this.closeMenu(operationMenuPopupWindow);
-                refreshDirectory(path, !showHideFile);
-            }
-        });
-    }
-
-    /**
-     * 展示排序方式菜单
-     */
-    private void showSortMethodMenu() {
-        final SortMenuPopupWindow sortMenuPopupWindow = new SortMenuPopupWindow(this.getSupportFragmentManager().getFragments().get(mCurrentFragmentPosition));
-        sortMenuPopupWindow.showAtLocation(findViewById(R.id.id_main_activity), Gravity.TOP, 0, 0);
-        sortMenuPopupWindow.setOnSortItemClickListener(new SortMenuPopupWindow.OnSortItemClickListener() {
-            @Override
-            public void closeMenu() {
-               MainActivity.this.closeMenu(sortMenuPopupWindow);
-            }
-
-            @Override
-            public void sortByName(String path) {
-                MainActivity.this.closeMenu(sortMenuPopupWindow);
-                MainActivity.this.refreshDirectory(path, true);
-            }
-
-            @Override
-            public void sortBySizeDesc(String path) {
-                MainActivity.this.closeMenu(sortMenuPopupWindow);
-                //从大到小排序
-                MainActivity.this.refreshDirectory(FileUtils.filterSortFileBySize(path, true), false);
-            }
-
-            @Override
-            public void sortBySizeAsc(String path) {
-                MainActivity.this.closeMenu(sortMenuPopupWindow);
-                //从大到小排序
-                MainActivity.this.refreshDirectory(FileUtils.filterSortFileBySize(path, false), false);
-            }
-
-            @Override
-            public void sortByModifyDate(String path) {
-                MainActivity.this.closeMenu(sortMenuPopupWindow);
-                //从大到小排序
-                MainActivity.this.refreshDirectory(FileUtils.filterSortFileByLastModifiedTime(path), false);
-            }
-        });
-    }
-
-    /**
-     * 关闭隐藏下拉菜单
-     */
-    private void closeMenu(PopupWindow popupWindow) {
-        if (popupWindow.isShowing()) {
-            popupWindow.dismiss();
-        }
-    }
-
-    /**
-     * 刷新目录显示
-     * @param path
-     * @param showHideFile
-     */
-    private void refreshDirectory(String path, boolean showHideFile){
-        Fragment fragment = MainActivity.this.getSupportFragmentManager()
-                .getFragments().get(mCurrentFragmentPosition);
-        if (fragment instanceof FileListFragment) {
-            FileListFragment fileListFragment = (FileListFragment) fragment;
-            fileListFragment.showChange(FileUtils.filterSortFileByName(path, showHideFile));
-        }
-    }
-
-    /**
-     * 刷新目录显示
-     * @param fileArray
-     * @param showHideFile
-     */
-    private void refreshDirectory(File[] fileArray, boolean showHideFile){
-        Fragment fragment = MainActivity.this.getSupportFragmentManager()
-                .getFragments().get(mCurrentFragmentPosition);
-        if (fragment instanceof FileListFragment) {
-            FileListFragment fileListFragment = (FileListFragment) fragment;
-            fileListFragment.showChange(fileArray);
-        }
     }
 }

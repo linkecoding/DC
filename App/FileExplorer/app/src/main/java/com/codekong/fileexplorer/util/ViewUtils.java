@@ -3,6 +3,8 @@ package com.codekong.fileexplorer.util;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.jwenfeng.library.pulltorefresh.PullToRefreshLayout;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -18,7 +20,7 @@ public class ViewUtils {
      * @return  boolean 成功执行返回true
      *
      */
-    public static boolean MIUISetStatusBarLightMode(Window window, boolean dark) {
+    public static boolean miuiSetStatusBarLightMode(Window window, boolean dark) {
         boolean result = false;
         if (window != null) {
             Class clazz = window.getClass();
@@ -49,7 +51,7 @@ public class ViewUtils {
      * @return  boolean 成功执行返回true
      *
      */
-    public static boolean FlymeSetStatusBarLightMode(Window window, boolean dark) {
+    public static boolean flymeSetStatusBarLightMode(Window window, boolean dark) {
         boolean result = false;
         if (window != null) {
             try {
@@ -75,5 +77,23 @@ public class ViewUtils {
             }
         }
         return result;
+    }
+
+    /**
+     * 通过反射禁用下拉刷新
+     * @param disable
+     */
+    public static void disablePullToRefresh(PullToRefreshLayout pullToRefreshLayout, boolean disable){
+        Class<PullToRefreshLayout> pullToRefreshClass = PullToRefreshLayout.class;
+        try {
+            Field canRefreshField = pullToRefreshClass.getDeclaredField("canRefresh");
+            canRefreshField.setAccessible(true);
+            canRefreshField.set(pullToRefreshLayout, disable);
+            canRefreshField.setAccessible(false);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 }

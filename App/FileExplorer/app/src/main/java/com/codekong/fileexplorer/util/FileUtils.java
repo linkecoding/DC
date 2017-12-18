@@ -130,9 +130,9 @@ public class FileUtils {
                     return 1;
                 } else if (file.isFile() && t1.isFile()) {
                     if (desc) {
-                        return file.length() - t1.length() > 0 ? -1 : 1;
+                        return file.length() - t1.length() >= 0 ? -1 : 1;
                     } else {
-                        return file.length() - t1.length() > 0 ? 1 : -1;
+                        return file.length() - t1.length() >= 0 ? 1 : -1;
                     }
                 }
                 return file.getName().compareToIgnoreCase(t1.getName());

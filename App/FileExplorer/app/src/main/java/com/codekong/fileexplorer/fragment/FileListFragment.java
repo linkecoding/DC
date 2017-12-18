@@ -1,13 +1,21 @@
 package com.codekong.fileexplorer.fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,14 +23,18 @@ import com.codekong.fileexplorer.R;
 import com.codekong.fileexplorer.adapter.FileListAdapter;
 import com.codekong.fileexplorer.base.BaseFragment;
 import com.codekong.fileexplorer.util.FileUtils;
+import com.codekong.fileexplorer.util.ViewUtils;
+import com.codekong.fileexplorer.view.OperationMenuPopupWindow;
+import com.codekong.fileexplorer.view.SortMenuPopupWindow;
 import com.jwenfeng.library.pulltorefresh.BaseRefreshListener;
 import com.jwenfeng.library.pulltorefresh.PullToRefreshLayout;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -61,6 +73,79 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
     }
 
     @Override
+    protected void initWidget(View root) {
+        super.initWidget(root);
+        if (getActivity().getWindow() != null){
+            final View mainActivityView = getActivity().getWindow().getDecorView().getRootView();
+            ImageView moreOperationView = mainActivityView.findViewById(R.id.id_more_operation);
+            moreOperationView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final OperationMenuPopupWindow operationMenuPopupWindow = new OperationMenuPopupWindow(FileListFragment.this);
+                    operationMenuPopupWindow.showAtLocation(mainActivityView.findViewById(R.id.id_main_activity), Gravity.TOP, 0, 0);
+                    operationMenuPopupWindow.setOnWindowItemClickListener(new OperationMenuPopupWindow.OnWindowItemClickListener() {
+                        @Override
+                        public void closeMenu() {
+                            FileListFragment.this.closeMenu(operationMenuPopupWindow);
+                        }
+
+                        @Override
+                        public void sort(String path) {
+                            FileListFragment.this.closeMenu(operationMenuPopupWindow);
+                            showSortMethodMenu();
+                        }
+
+                        @Override
+                        public void newFolder(final String path) {
+                            FileListFragment.this.closeMenu(operationMenuPopupWindow);
+                            final View view = (LinearLayout) getLayoutInflater().inflate(R.layout.input_layout, null);
+                            //新文件名输入框
+                            final EditText et = view.findViewById(R.id.id_input_ed);
+                            //自定义弹出框标题
+                            final TextView titleTv = new TextView(FileListFragment.this.getContext());
+                            titleTv.setText(FileListFragment.this.getString(R.string.str_new_folder));
+                            titleTv.setTextSize(16);
+                            titleTv.setGravity(Gravity.CENTER_HORIZONTAL);
+                            new AlertDialog.Builder(FileListFragment.this.getActivity())
+                                    .setView(view)
+                                    .setCancelable(false)
+                                    .setPositiveButton(FileListFragment.this.getString(R.string.str_new_create), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (!TextUtils.isEmpty(et.getText())) {
+                                                File file = new File(path, et.getText().toString());
+                                                if (!file.exists()) {
+                                                    if (file.mkdirs()) {
+                                                        //创建文件夹成功,刷新目录显示
+                                                        notifyDataChange(FileUtils.filterSortFileByName(path, true));
+                                                        showToast(getString(R.string.str_folder_create_success));
+                                                    } else {
+                                                        showToast(getString(R.string.str_folder_create_failed));
+                                                    }
+                                                } else {
+                                                    //文件夹已经存在
+                                                    showToast(getString(R.string.str_folder_exist));
+                                                }
+                                            }
+                                        }
+                                    })
+                                    .setNegativeButton(FileListFragment.this.getString(R.string.str_cancel), null)
+                                    .show();
+                        }
+
+                        @Override
+                        public void showHideFolder(String path, boolean showHideFile) {
+                            FileListFragment.this.closeMenu(operationMenuPopupWindow);
+                            notifyDataChange(FileUtils.filterSortFileByName(path, !showHideFile));
+                        }
+                    });
+
+                }
+            });
+        }
+    }
+
+    @Override
     protected void initData() {
         String fileNowPath = "";
         //对文件进行过滤和排序
@@ -94,19 +179,19 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (firstVisibleItem != 0){
-                    disablePullToRefresh(mPullToRefreshLayout, false);
+                    ViewUtils.disablePullToRefresh(mPullToRefreshLayout, false);
                 }else{
-                    disablePullToRefresh(mPullToRefreshLayout, true);
+                    ViewUtils.disablePullToRefresh(mPullToRefreshLayout, true);
                 }
             }
         });
-
+        //禁用上拉加载
         mPullToRefreshLayout.setCanLoadMore(false);
         mPullToRefreshLayout.setRefreshListener(new BaseRefreshListener() {
             @Override
             public void refresh() {
-                initData();
-                mPullToRefreshLayout.finishRefresh();
+                //刷新当前目录
+                notifyDataChange(mNowFilePathTv.getText().toString());
             }
 
             @Override
@@ -142,29 +227,8 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
         } else {
             //是目录则进入下级目录
             mNowPathStack.push("/" + fileName);
-            showChange(FileUtils.getNowStackPathString(mNowPathStack));
+            notifyDataChange(FileUtils.getNowStackPathString(mNowPathStack));
         }
-    }
-
-    /**
-     * 改变数据源，刷新列表
-     */
-    public void showChange(String path) {
-        mNowFilePathTv.setText(path);
-        mFilesArray = FileUtils.filterSortFileByName(path, true);
-        mFileList.clear();
-        mFileList.addAll(Arrays.asList(mFilesArray));
-        mFileListAdapter.updateFileList(mFileList);
-    }
-
-    /**
-     * 改变数据源，刷新列表
-     */
-    public void showChange(File[] fileArray) {
-        mFilesArray = fileArray;
-        mFileList.clear();
-        mFileList.addAll(Arrays.asList(mFilesArray));
-        mFileListAdapter.updateFileList(mFileList);
     }
 
     @OnClick(R.id.id_now_file_path_tv)
@@ -176,24 +240,92 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
             }
             mNowPathStack.pop();
         }
-        showChange(FileUtils.getNowStackPathString(mNowPathStack));
+        //刷新文件列表显示
+        notifyDataChange(FileUtils.getNowStackPathString(mNowPathStack));
     }
 
     /**
-     * 通过反射禁用下拉刷新
-     * @param disable
+     * 改变数据源，刷新列表
      */
-    private void disablePullToRefresh(PullToRefreshLayout pullToRefreshLayout, boolean disable){
-        Class<PullToRefreshLayout> pullToRefreshClass = PullToRefreshLayout.class;
-        try {
-            Field canRefreshField = pullToRefreshClass.getDeclaredField("canRefresh");
-            canRefreshField.setAccessible(true);
-            canRefreshField.set(pullToRefreshLayout, disable);
-            canRefreshField.setAccessible(false);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+    public void notifyDataChange(final String path) {
+        mNowFilePathTv.setText(path);
+        ExecutorService singleThreadPool = Executors.newSingleThreadExecutor();
+        singleThreadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                mFilesArray = FileUtils.filterSortFileByName(path, true);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mFileList.clear();
+                        mFileList.addAll(Arrays.asList(mFilesArray));
+                        mFileListAdapter.updateFileList(mFileList);
+                        //刷新完成
+                        mPullToRefreshLayout.finishRefresh();
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * 改变数据源，刷新列表
+     */
+    public void notifyDataChange(File[] fileArray) {
+        mFilesArray = fileArray;
+        mFileList.clear();
+        mFileList.addAll(Arrays.asList(mFilesArray));
+        mFileListAdapter.updateFileList(mFileList);
+    }
+
+    /**
+     * 展示排序方式菜单
+     */
+    private void showSortMethodMenu() {
+        final View mainActivityView = getActivity().getWindow().getDecorView().getRootView();
+        final SortMenuPopupWindow sortMenuPopupWindow = new SortMenuPopupWindow(this);
+        sortMenuPopupWindow.showAtLocation(mainActivityView.findViewById(R.id.id_main_activity), Gravity.TOP, 0, 0);
+        sortMenuPopupWindow.setOnSortItemClickListener(new SortMenuPopupWindow.OnSortItemClickListener() {
+            @Override
+            public void closeMenu() {
+                FileListFragment.this.closeMenu(sortMenuPopupWindow);
+            }
+
+            @Override
+            public void sortByName(String path) {
+                FileListFragment.this.closeMenu(sortMenuPopupWindow);
+                notifyDataChange(FileUtils.filterSortFileByName(path, true));
+            }
+
+            @Override
+            public void sortBySizeDesc(String path) {
+                FileListFragment.this.closeMenu(sortMenuPopupWindow);
+                //从大到小排序
+                notifyDataChange(FileUtils.filterSortFileBySize(path, true));
+            }
+
+            @Override
+            public void sortBySizeAsc(String path) {
+                FileListFragment.this.closeMenu(sortMenuPopupWindow);
+                //从大到小排序
+                notifyDataChange(FileUtils.filterSortFileBySize(path, false));
+            }
+
+            @Override
+            public void sortByModifyDate(String path) {
+                FileListFragment.this.closeMenu(sortMenuPopupWindow);
+                //从大到小排序
+                notifyDataChange(FileUtils.filterSortFileByLastModifiedTime(path));
+            }
+        });
+    }
+
+    /**
+     * 关闭隐藏下拉菜单
+     */
+    private void closeMenu(PopupWindow popupWindow) {
+        if (popupWindow.isShowing()) {
+            popupWindow.dismiss();
         }
     }
 
@@ -207,8 +339,16 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
             //退到上级目录
             mNowPathStack.pop();
             //刷新目录
-            showChange(FileUtils.getNowStackPathString(mNowPathStack));
+            notifyDataChange(FileUtils.getNowStackPathString(mNowPathStack));
             return true;
         }
+    }
+
+    /**
+     * 展示提示信息
+     * @param msg
+     */
+    private void showToast(String msg){
+        Toast.makeText(FileListFragment.this.getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 }
