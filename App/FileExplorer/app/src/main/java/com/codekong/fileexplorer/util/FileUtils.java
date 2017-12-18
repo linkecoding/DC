@@ -10,21 +10,11 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Stack;
 
-/**
- * Created by szh on 2017/2/8.
- */
-
 public class FileUtils {
     //文件大小
     private static final long KB = 2 << 9;
     private static final long MB = 2 << 19;
     private static final long GB = 2 << 29;
-
-    //日期格式化
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-    //当前路径
-    private static String mNowPath;
-    private static Stack<String> mNowPathStack;
 
     /**
      * 获得指定文件的大小
@@ -55,6 +45,7 @@ public class FileUtils {
      * @return
      */
     public static String getFileDate(File file) {
+        final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         return dateFormat.format(new Date(file.lastModified()));
     }
 
@@ -64,34 +55,13 @@ public class FileUtils {
      * @return
      */
     public static String getNowStackPathString(Stack<String> nowPathStack) {
-        mNowPathStack = nowPathStack;
         String result = "";
         Stack<String> temp = new Stack<>();
         temp.addAll(nowPathStack);
         while (temp.size() != 0) {
             result = temp.pop() + result;
         }
-        mNowPath = result;
         return result;
-    }
-
-    /**
-     * 获得当前路径
-     *
-     * @return
-     */
-    public static String getNowPath() {
-        return mNowPath;
-    }
-
-    /**
-     * 返回上级目录
-     *
-     * @return
-     */
-    public static String returnToParentDir() {
-        mNowPathStack.pop();
-        return mNowPath;
     }
 
     /**

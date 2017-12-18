@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:layout_width="80dp"
-    android:layout_height="80dp"
+    android:layout_width="@dimen/len_80"
+    android:layout_height="@dimen/len_80"
     android:background="@color/colorWhite">
     <ImageView
         android:id="@+id/id_category_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/len_40"
+        android:layout_height="@dimen/len_40"
         android:layout_gravity="center_horizontal"
         android:scaleType="fitXY"
         android:src="@drawable/ic_folder"/>
@@ -17,14 +18,14 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="视频"
-        android:textSize="13sp"
-        android:layout_marginTop="5dp"/>
+        android:textSize="@dimen/font_12"
+        android:layout_marginTop="@dimen/len_4"/>
     <TextView
         android:id="@+id/id_category_nums"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0项"
-        android:textSize="11sp"
+        tools:text="0项"
+        android:textSize="@dimen/font_10"
         android:layout_gravity="center_horizontal"/>
 
 </LinearLayout>

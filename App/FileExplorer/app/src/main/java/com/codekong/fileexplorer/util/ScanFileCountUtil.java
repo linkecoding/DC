@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by 尚振鸿 on 17-12-16. 14:26
@@ -30,7 +29,7 @@ public class ScanFileCountUtil {
     //各个分类所对应的文件后缀
     private Map<String, Set<String>> mCategorySuffix;
     //最终的统计结果
-    private ConcurrentHashMap<String, AtomicInteger> mCountResult;
+    private ConcurrentHashMap<String, Integer> mCountResult;
     //用于存储文件目录便于层次遍历
     private ConcurrentLinkedQueue<File> mFileConcurrentLinkedQueue;
     private Handler mHandler = null;
@@ -48,7 +47,7 @@ public class ScanFileCountUtil {
         //初始化每个类别的数目为0
         for (String category : mCategorySuffix.keySet()) {
             //将最后统计结果的key设置为类别
-            mCountResult.put(category, new AtomicInteger(0));
+            mCountResult.put(category, 0);
         }
 
         //获取到根目录下的文件和文件夹
@@ -81,7 +80,7 @@ public class ScanFileCountUtil {
                     String suffix = f.getName().substring(f.getName().indexOf(".") + 1).toLowerCase();
                     //找到了
                     if (entry.getValue().contains(suffix)) {
-                        mCountResult.get(entry.getKey()).set(mCountResult.get(entry.getKey()).get() + 1);
+                        mCountResult.put(entry.getKey(), mCountResult.get(entry.getKey()) + 1);
                         break;
                     }
                 }
@@ -95,8 +94,8 @@ public class ScanFileCountUtil {
         }
         executorService.shutdown();
         //等待线程池中的所有线程运行完成
-        while (true){
-            if (executorService.isTerminated()){
+        while (true) {
+            if (executorService.isTerminated()) {
                 break;
             }
             try {
@@ -138,7 +137,7 @@ public class ScanFileCountUtil {
                         String suffix = f.getName().substring(f.getName().indexOf(".") + 1).toLowerCase();
                         //找到了
                         if (entry.getValue().contains(suffix)) {
-                            mCountResult.get(entry.getKey()).set(mCountResult.get(entry.getKey()).get() + 1);
+                            mCountResult.put(entry.getKey(), mCountResult.get(entry.getKey()) + 1);
                             break;
                         }
                     }
@@ -147,34 +146,35 @@ public class ScanFileCountUtil {
         }
     }
 
-    public static class Builder{
+    public static class Builder {
         private Handler mHandler;
         private String mFilePath;
         //各个分类所对应的文件后缀
         private Map<String, Set<String>> mCategorySuffix;
-        public Builder(Handler handler){
+
+        public Builder(Handler handler) {
             this.mHandler = handler;
         }
 
-        public Builder setFilePath(String filePath){
+        public Builder setFilePath(String filePath) {
             this.mFilePath = filePath;
             return this;
         }
 
-        public Builder setCategorySuffix(Map<String, Set<String>> categorySuffix){
+        public Builder setCategorySuffix(Map<String, Set<String>> categorySuffix) {
             this.mCategorySuffix = categorySuffix;
             return this;
         }
 
-        private void applyConfig(ScanFileCountUtil scanFileCountUtil){
+        private void applyConfig(ScanFileCountUtil scanFileCountUtil) {
             scanFileCountUtil.mFilePath = mFilePath;
             scanFileCountUtil.mCategorySuffix = mCategorySuffix;
             scanFileCountUtil.mHandler = mHandler;
-            scanFileCountUtil.mCountResult = new ConcurrentHashMap<String, AtomicInteger>(mCategorySuffix.size());
+            scanFileCountUtil.mCountResult = new ConcurrentHashMap<String, Integer>(mCategorySuffix.size());
             scanFileCountUtil.mFileConcurrentLinkedQueue = new ConcurrentLinkedQueue<>();
         }
 
-        public ScanFileCountUtil create(){
+        public ScanFileCountUtil create() {
             ScanFileCountUtil scanFileCountUtil = new ScanFileCountUtil();
             applyConfig(scanFileCountUtil);
             return scanFileCountUtil;

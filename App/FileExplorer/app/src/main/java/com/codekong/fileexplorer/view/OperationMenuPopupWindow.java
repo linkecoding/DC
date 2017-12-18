@@ -23,7 +23,6 @@ import butterknife.OnClick;
 public class OperationMenuPopupWindow extends PopupWindow implements View.OnKeyListener {
     private static final String TAG = "OperationMenuPopupWindo";
     private Fragment mFragment;
-    private View rootView;
     private OnWindowItemClickListener onWindowItemClickListener;
     //是否正在显示隐藏文件
     private static boolean showHideFile = false;
@@ -31,7 +30,7 @@ public class OperationMenuPopupWindow extends PopupWindow implements View.OnKeyL
     public OperationMenuPopupWindow(Fragment fragment) {
         mFragment = fragment;
         LayoutInflater inflater = LayoutInflater.from(mFragment.getContext());
-        rootView = inflater.inflate(R.layout.operation_popup_window_menu, null);
+        View rootView = inflater.inflate(R.layout.operation_popup_window_menu, null);
         TextView textView = rootView.findViewById(R.id.id_action_show_hide_folder);
         if (showHideFile){
             //目前隐藏文件是显示的

@@ -1,15 +1,11 @@
 package com.codekong.fileexplorer.fragment;
 
 import android.Manifest;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -17,6 +13,7 @@ import android.widget.TextView;
 import com.codekong.fileexplorer.R;
 import com.codekong.fileexplorer.adapter.CommonAdapter;
 import com.codekong.fileexplorer.adapter.ViewHolder;
+import com.codekong.fileexplorer.base.BaseFragment;
 import com.codekong.fileexplorer.bean.Category;
 import com.codekong.fileexplorer.config.Constant;
 import com.codekong.fileexplorer.util.ScanFileCountUtil;
@@ -29,10 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -42,6 +37,7 @@ import pub.devrel.easypermissions.EasyPermissions;
  */
 
 public class FileCategoryFragment extends BaseFragment implements EasyPermissions.PermissionCallbacks {
+    //请求存储卡权限的请求码
     private static final int REQUEST_CODE_EXTERNAL_STORAGE = 0X01;
 
     @BindView(R.id.id_start_search)
@@ -62,12 +58,12 @@ public class FileCategoryFragment extends BaseFragment implements EasyPermission
         public void handleMessage(Message msg) {
             mCategoryData.clear();
             mPullToRefreshLayout.finishRefresh();
-            Map<String, AtomicInteger> countRes = (Map<String, AtomicInteger>) msg.obj;
+            Map<String, Integer> countRes = (Map<String, Integer>) msg.obj;
             for (int i = 0; i < Constant.FILE_CATEGORY_ICON.length; i++) {
                 Category category = new Category();
                 category.setCategoryIcon(Constant.FILE_CATEGORY_ICON[i]);
                 category.setCategoryName(Constant.FILE_CATEGORY_NAME[i]);
-                category.setCategoryNums(countRes.get(Constant.FILE_CATEGORY_ICON[i].substring(3)).get() + "项");
+                category.setCategoryNums(countRes.get(Constant.FILE_CATEGORY_ICON[i].substring(3)) + "项");
                 mCategoryData.add(category);
             }
             mLoadingFrameLayout.setVisibility(View.GONE);
@@ -76,20 +72,12 @@ public class FileCategoryFragment extends BaseFragment implements EasyPermission
     };
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_file_category, container, false);
-        ButterKnife.bind(this, view);
-        return view;
+    protected int getContentLayoutId() {
+        return R.layout.fragment_file_category;
     }
 
     @Override
-    protected void loadData() {
+    protected void initData() {
         if (!EasyPermissions.hasPermissions(FileCategoryFragment.this.getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)){
             EasyPermissions.requestPermissions(this,"需要读取文件目录",
                     REQUEST_CODE_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -99,11 +87,6 @@ public class FileCategoryFragment extends BaseFragment implements EasyPermission
             //扫描文件
             scanFile();
         }
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
     }
 
     /**
@@ -139,13 +122,11 @@ public class FileCategoryFragment extends BaseFragment implements EasyPermission
         mCategoryGridView.setAdapter(mAdapter);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
     public int getResId(String iconName){
-        return getContext().getResources().getIdentifier(iconName, "drawable", getContext().getPackageName());
+        if (getContext().getResources() != null){
+            return getContext().getResources().getIdentifier(iconName, "drawable", getContext().getPackageName());
+        }
+        return 0;
     }
 
     /**

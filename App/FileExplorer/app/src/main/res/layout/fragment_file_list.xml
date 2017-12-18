@@ -14,7 +14,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/len_52"
+        android:layout_height="@dimen/len_48"
         android:background="@color/colorWhite">
     <TextView
         android:id="@+id/id_start_search"

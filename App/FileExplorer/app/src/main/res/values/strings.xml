@@ -29,4 +29,5 @@
     <string name="str_folder_exist">文件夹已经存在</string>
     <string name="str_not_show_hidden_file">不显示隐藏文件</string>
     <string name="str_scanning">正在扫描</string>
+    <string name="str_check_all">全选</string>
 </resources>
