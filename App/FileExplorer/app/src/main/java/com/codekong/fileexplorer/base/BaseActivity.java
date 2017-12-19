@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.codekong.fileexplorer.R;
+import com.codekong.fileexplorer.util.ViewUtils;
 
 import java.util.List;
 
@@ -57,6 +58,8 @@ public abstract class BaseActivity extends AppCompatActivity {
      * 初始化控件
      */
     protected void initWidget() {
+        //设置状态栏的白底黑字
+        ViewUtils.miuiSetStatusBarLightMode(getWindow(), true);
         mUnbinder = ButterKnife.bind(this);
     }
 

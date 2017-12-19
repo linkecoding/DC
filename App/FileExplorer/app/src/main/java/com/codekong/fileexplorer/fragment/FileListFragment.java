@@ -4,9 +4,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.view.ActionMode;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AbsListView;
@@ -20,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codekong.fileexplorer.R;
+import com.codekong.fileexplorer.activity.MainActivity;
 import com.codekong.fileexplorer.adapter.FileListAdapter;
 import com.codekong.fileexplorer.base.BaseFragment;
 import com.codekong.fileexplorer.util.FileUtils;
@@ -44,7 +50,8 @@ import butterknife.OnClick;
  * 文件列表Fragment
  */
 
-public class FileListFragment extends BaseFragment implements AdapterView.OnItemClickListener {
+public class FileListFragment extends BaseFragment implements AdapterView.OnItemClickListener,
+        AdapterView.OnItemLongClickListener, AbsListView.MultiChoiceModeListener {
     private static final String TAG = "FileListFragment";
     
     @BindView(R.id.id_start_search)
@@ -67,6 +74,7 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
     //当前的文件路径堆栈
     private Stack<String> mNowPathStack;
 
+
     @Override
     protected int getContentLayoutId() {
         return R.layout.fragment_file_list;
@@ -75,74 +83,48 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
     @Override
     protected void initWidget(View root) {
         super.initWidget(root);
-        if (getActivity().getWindow() != null){
-            final View mainActivityView = getActivity().getWindow().getDecorView().getRootView();
-            ImageView moreOperationView = mainActivityView.findViewById(R.id.id_more_operation);
-            moreOperationView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    final OperationMenuPopupWindow operationMenuPopupWindow = new OperationMenuPopupWindow(FileListFragment.this);
-                    operationMenuPopupWindow.showAtLocation(mainActivityView.findViewById(R.id.id_main_activity), Gravity.TOP, 0, 0);
-                    operationMenuPopupWindow.setOnWindowItemClickListener(new OperationMenuPopupWindow.OnWindowItemClickListener() {
-                        @Override
-                        public void closeMenu() {
-                            FileListFragment.this.closeMenu(operationMenuPopupWindow);
-                        }
 
-                        @Override
-                        public void sort(String path) {
-                            FileListFragment.this.closeMenu(operationMenuPopupWindow);
-                            showSortMethodMenu();
-                        }
-
-                        @Override
-                        public void newFolder(final String path) {
-                            FileListFragment.this.closeMenu(operationMenuPopupWindow);
-                            final View view = (LinearLayout) getLayoutInflater().inflate(R.layout.input_layout, null);
-                            //新文件名输入框
-                            final EditText et = view.findViewById(R.id.id_input_ed);
-                            //自定义弹出框标题
-                            final TextView titleTv = new TextView(FileListFragment.this.getContext());
-                            titleTv.setText(FileListFragment.this.getString(R.string.str_new_folder));
-                            titleTv.setTextSize(16);
-                            titleTv.setGravity(Gravity.CENTER_HORIZONTAL);
-                            new AlertDialog.Builder(FileListFragment.this.getActivity())
-                                    .setView(view)
-                                    .setCancelable(false)
-                                    .setPositiveButton(FileListFragment.this.getString(R.string.str_new_create), new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            if (!TextUtils.isEmpty(et.getText())) {
-                                                File file = new File(path, et.getText().toString());
-                                                if (!file.exists()) {
-                                                    if (file.mkdirs()) {
-                                                        //创建文件夹成功,刷新目录显示
-                                                        notifyDataChange(FileUtils.filterSortFileByName(path, true));
-                                                        showToast(getString(R.string.str_folder_create_success));
-                                                    } else {
-                                                        showToast(getString(R.string.str_folder_create_failed));
-                                                    }
-                                                } else {
-                                                    //文件夹已经存在
-                                                    showToast(getString(R.string.str_folder_exist));
-                                                }
-                                            }
-                                        }
-                                    })
-                                    .setNegativeButton(FileListFragment.this.getString(R.string.str_cancel), null)
-                                    .show();
-                        }
-
-                        @Override
-                        public void showHideFolder(String path, boolean showHideFile) {
-                            FileListFragment.this.closeMenu(operationMenuPopupWindow);
-                            notifyDataChange(FileUtils.filterSortFileByName(path, !showHideFile));
-                        }
-                    });
-
-                }
-            });
+        ActionBar actionBar = null;
+        if (getActivity() instanceof MainActivity){
+            MainActivity mainActivity = (MainActivity) getActivity();
+            actionBar = mainActivity.getSupportActionBar();
         }
+        if (actionBar == null){
+            return;
+        }
+        final View actionBarView = actionBar.getCustomView();
+        ImageView moreOperationView = actionBarView.findViewById(R.id.id_more_operation);
+        moreOperationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final OperationMenuPopupWindow operationMenuPopupWindow = new OperationMenuPopupWindow(FileListFragment.this);
+                operationMenuPopupWindow.showAtLocation(actionBarView, Gravity.TOP, 0, 0);
+                operationMenuPopupWindow.setOnWindowItemClickListener(new OperationMenuPopupWindow.OnWindowItemClickListener() {
+                    @Override
+                    public void closeMenu() {
+                        FileListFragment.this.closeMenu(operationMenuPopupWindow);
+                    }
+
+                    @Override
+                    public void sort(String path) {
+                        FileListFragment.this.closeMenu(operationMenuPopupWindow);
+                        showSortMethodMenu();
+                    }
+
+                    @Override
+                    public void newFolder(final String path) {
+                        FileListFragment.this.newFolder(path, operationMenuPopupWindow);
+                    }
+
+                    @Override
+                    public void showHideFolder(String path, boolean showHideFile) {
+                        FileListFragment.this.closeMenu(operationMenuPopupWindow);
+                        notifyDataChange(FileUtils.filterSortFileByName(path, !showHideFile));
+                    }
+                });
+
+            }
+        });
     }
 
     @Override
@@ -161,6 +143,7 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
         mFileListAdapter = new FileListAdapter(this.getContext(), mFileList);
         mFileListView.setAdapter(mFileListAdapter);
         mFileListView.setOnItemClickListener(this);
+        mFileListView.setOnItemLongClickListener(this);
         //设置没有item显示时默认显示的图标
         mFileListView.setEmptyView(mEmptyView);
         initEvent();
@@ -279,9 +262,54 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
     }
 
     /**
+     * 弹出新建文件夹对话框
+     * @param path
+     * @param operationMenuPopupWindow
+     */
+    private void newFolder(final String path, OperationMenuPopupWindow operationMenuPopupWindow) {
+        FileListFragment.this.closeMenu(operationMenuPopupWindow);
+        final View view = (LinearLayout) getLayoutInflater().inflate(R.layout.input_layout, null);
+        //新文件名输入框
+        final EditText et = view.findViewById(R.id.id_input_ed);
+        //自定义弹出框标题
+        final TextView titleTv = new TextView(FileListFragment.this.getContext());
+        titleTv.setText(FileListFragment.this.getString(R.string.str_new_folder));
+        titleTv.setTextSize(16);
+        titleTv.setGravity(Gravity.CENTER_HORIZONTAL);
+        new AlertDialog.Builder(FileListFragment.this.getActivity())
+                .setView(view)
+                .setCancelable(false)
+                .setPositiveButton(FileListFragment.this.getString(R.string.str_new_create), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (!TextUtils.isEmpty(et.getText())) {
+                            File file = new File(path, et.getText().toString());
+                            if (!file.exists()) {
+                                if (file.mkdirs()) {
+                                    //创建文件夹成功,刷新目录显示
+                                    notifyDataChange(FileUtils.filterSortFileByName(path, true));
+                                    showToast(getString(R.string.str_folder_create_success));
+                                } else {
+                                    showToast(getString(R.string.str_folder_create_failed));
+                                }
+                            } else {
+                                //文件夹已经存在
+                                showToast(getString(R.string.str_folder_exist));
+                            }
+                        }
+                    }
+                })
+                .setNegativeButton(FileListFragment.this.getString(R.string.str_cancel), null)
+                .show();
+    }
+
+    /**
      * 展示排序方式菜单
      */
     private void showSortMethodMenu() {
+        if (getActivity().getWindow() == null){
+            return;
+        }
         final View mainActivityView = getActivity().getWindow().getDecorView().getRootView();
         final SortMenuPopupWindow sortMenuPopupWindow = new SortMenuPopupWindow(this);
         sortMenuPopupWindow.showAtLocation(mainActivityView.findViewById(R.id.id_main_activity), Gravity.TOP, 0, 0);
@@ -350,5 +378,56 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
      */
     private void showToast(String msg){
         Toast.makeText(FileListFragment.this.getContext(), msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        //开启ListView的多选模式(该种多选模式下自动屏蔽onClick)
+        mFileListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        //设置监听事件
+        mFileListView.setMultiChoiceModeListener(this);
+        return false;
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        //显示全选和取消按钮View
+//        if (getActivity().getWindow() == null){
+//            return false;
+//        }
+//        final View mainActivityView = getActivity().getWindow().getDecorView().getRootView();
+//        View multiChoiceView = mainActivityView.findViewById(R.id.id_multi_choice_view);
+//        //显示全选和取消按钮视图
+//        multiChoiceView.setVisibility(View.VISIBLE);
+//        Button cancelSelectBtn = mainActivityView.findViewById(R.id.id_cancel_select_btn);
+//        Button selectAllBtn = mainActivityView.findViewById(R.id.id_select_all_btn);
+//        TextView selectCountTv = mainActivityView.findViewById(R.id.id_selected_count_tv);
+//        MenuInflater menuInflater = mode.getMenuInflater();
+//        menuInflater.inflate(R.menu.file_list_multichoice_menu, menu);
+        View multiSelectionbarView = LayoutInflater
+                .from(FileListFragment.this.getActivity())
+                .inflate(R.layout.custom_select_action_mode_layout, null, false);
+        mode.setCustomView(multiSelectionbarView);
+        return true;
+    }
+
+    @Override
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        return false;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        mFileListView.clearChoices();
     }
 }

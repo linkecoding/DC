@@ -14,7 +14,6 @@ import com.codekong.fileexplorer.fragment.FileListFragment;
  */
 
 public class SwitchViewPagerAdapter extends FragmentPagerAdapter {
-    private int mCurrentPosition = 0;
     private String[] mTabName = new String[2];
     public SwitchViewPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
@@ -24,11 +23,12 @@ public class SwitchViewPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+        int currentPosition = 0;
         if (position == 1){
-            mCurrentPosition = 1;
+            currentPosition = 1;
             return new FileListFragment();
         }
-        mCurrentPosition = 0;
+        currentPosition = 0;
         return new FileCategoryFragment();
     }
 
