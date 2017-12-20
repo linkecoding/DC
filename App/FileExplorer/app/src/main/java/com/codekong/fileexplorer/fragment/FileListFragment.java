@@ -16,6 +16,7 @@ import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -51,7 +52,7 @@ import butterknife.OnClick;
  */
 
 public class FileListFragment extends BaseFragment implements AdapterView.OnItemClickListener,
-        AdapterView.OnItemLongClickListener, AbsListView.MultiChoiceModeListener {
+        AdapterView.OnItemLongClickListener, AbsListView.MultiChoiceModeListener, View.OnClickListener {
     private static final String TAG = "FileListFragment";
     
     @BindView(R.id.id_start_search)
@@ -73,6 +74,11 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
     private FileListAdapter mFileListAdapter;
     //当前的文件路径堆栈
     private Stack<String> mNowPathStack;
+
+    //当前选中的数量
+    private TextView mSelectedCountTv;
+    //ActionMode多选模式
+    private ActionMode mSelectFileActionMode;
 
 
     @Override
@@ -392,10 +398,14 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        //设置多选菜单
-        //mode.getMenuInflater().inflate(R.menu.file_list_multichoice_menu, menu);
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.custom_select_action_mode_layout, null);
-        mode.setCustomView(view);
+        mSelectFileActionMode = mode;
+        View customView = LayoutInflater.from(getActivity()).inflate(R.layout.custom_select_action_mode_layout, null);
+        Button selectAllBtn = customView.findViewById(R.id.id_select_all_btn);
+        Button selectCancleBtn = customView.findViewById(R.id.id_cancel_select_btn);
+        selectAllBtn.setOnClickListener(this);
+        selectCancleBtn.setOnClickListener(this);
+        mSelectedCountTv = customView.findViewById(R.id.id_selected_count_tv);
+        mode.setCustomView(customView);
         return true;
     }
 
@@ -420,5 +430,18 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
     public void onDestroyActionMode(ActionMode mode) {
         //清除多选状态
         mFileListView.clearChoices();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.id_select_all_btn:
+                break;
+            case R.id.id_cancel_select_btn:
+                mSelectFileActionMode.finish();
+                break;
+            default:
+
+        }
     }
 }
