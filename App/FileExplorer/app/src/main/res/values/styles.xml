@@ -14,6 +14,8 @@
         <!--修改菜单字体颜色-->
         <item name="android:actionMenuTextColor">@android:color/holo_blue_light</item>
         <item name="actionModeCloseDrawable">@drawable/ic_back_24dp</item>
+        <!-- Customize your theme here. -->
+        <item name="actionModeCloseButtonStyle">@style/ActionModeNoBack</item>
     </style>
 
     <style name="PopupWindowAnimStyle">
@@ -27,9 +29,15 @@
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowIsTranslucent">false</item>
-        <item name="android:windowNoTitle">true</item><!--除去title-->
+        <!--除去title-->
+        <item name="android:windowNoTitle">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:backgroundDimEnabled">false</item>
-        <item name="android:windowBackground">@null</item><!--除去背景色-->
+        <!--除去背景色-->
+        <item name="android:windowBackground">@null</item>
+    </style>
+
+    <style name="ActionModeNoBack" parent="Base.Widget.AppCompat.ActionButton.CloseMode">
+        <item name="android:visibility">gone</item>
     </style>
 </resources>

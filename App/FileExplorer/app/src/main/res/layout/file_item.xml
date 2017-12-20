@@ -62,7 +62,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:button="@null"
-        android:checked="true"
         android:background="@drawable/hcheckbox_style_selector"
-        android:layout_margin="@dimen/len_20"/>
+        android:layout_margin="@dimen/len_20"
+        android:visibility="gone"/>
 </RelativeLayout>

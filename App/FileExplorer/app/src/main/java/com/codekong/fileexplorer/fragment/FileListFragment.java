@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -385,12 +386,16 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
         mFileListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         //设置监听事件
         mFileListView.setMultiChoiceModeListener(this);
-        return false;
+        //不再调用click
+        return true;
     }
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        mode.getMenuInflater().inflate(R.menu.file_list_multichoice_menu, menu);
+        //设置多选菜单
+        //mode.getMenuInflater().inflate(R.menu.file_list_multichoice_menu, menu);
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.custom_select_action_mode_layout, null);
+        mode.setCustomView(view);
         return true;
     }
 
@@ -406,11 +411,14 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+        //当菜单项被点击时
         return false;
     }
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
+        //清除多选状态
         mFileListView.clearChoices();
     }
 }
