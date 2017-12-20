@@ -9,7 +9,6 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -391,23 +390,7 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        //显示全选和取消按钮View
-//        if (getActivity().getWindow() == null){
-//            return false;
-//        }
-//        final View mainActivityView = getActivity().getWindow().getDecorView().getRootView();
-//        View multiChoiceView = mainActivityView.findViewById(R.id.id_multi_choice_view);
-//        //显示全选和取消按钮视图
-//        multiChoiceView.setVisibility(View.VISIBLE);
-//        Button cancelSelectBtn = mainActivityView.findViewById(R.id.id_cancel_select_btn);
-//        Button selectAllBtn = mainActivityView.findViewById(R.id.id_select_all_btn);
-//        TextView selectCountTv = mainActivityView.findViewById(R.id.id_selected_count_tv);
-//        MenuInflater menuInflater = mode.getMenuInflater();
-//        menuInflater.inflate(R.menu.file_list_multichoice_menu, menu);
-        View multiSelectionbarView = LayoutInflater
-                .from(FileListFragment.this.getActivity())
-                .inflate(R.layout.custom_select_action_mode_layout, null, false);
-        mode.setCustomView(multiSelectionbarView);
+        mode.getMenuInflater().inflate(R.menu.file_list_multichoice_menu, menu);
         return true;
     }
 

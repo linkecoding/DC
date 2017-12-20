@@ -7,8 +7,15 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColor">@color/black</item>
-        <item name="actionModeCloseButtonStyle">@style/ActionModeNoBack</item>
+        <item name="android:actionModeBackground">@color/colorLightGray</item>
+        <!-- ActionMode右边的按钮是一个特殊的CloseButton，分割线与CloseButton的Style有关 -->
+        <!-- 删除ActionMode的Divider-->
+        <item name="android:actionModeCloseButtonStyle">@null</item>
+        <!--修改菜单字体颜色-->
+        <item name="android:actionMenuTextColor">@android:color/holo_blue_light</item>
+        <item name="actionModeCloseDrawable">@drawable/ic_back_24dp</item>
     </style>
+
     <style name="PopupWindowAnimStyle">
         <item name="android:windowEnterAnimation">@anim/top_in</item>
         <!-- 指定显示的动画xml -->
@@ -24,10 +31,5 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:windowBackground">@null</item><!--除去背景色-->
-    </style>
-
-    <!--ActionMode 没有返回箭头style-->
-    <style name="ActionModeNoBack" parent="Base.Widget.AppCompat.ActionButton.CloseMode">
-        <item name="android:visibility">gone</item>
     </style>
 </resources>
