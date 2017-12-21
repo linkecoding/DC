@@ -39,6 +39,8 @@ import com.jwenfeng.library.pulltorefresh.PullToRefreshLayout;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -79,7 +81,12 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
     private TextView mSelectedCountTv;
     //ActionMode多选模式
     private ActionMode mSelectFileActionMode;
-
+    //选中的position集合
+    private Set<Integer> mCheckedPos = new HashSet<>();
+    //全选按钮
+    private Button mSelectAllBtn;
+    //取消按钮
+    private Button mSelectCancelBtn;
 
     @Override
     protected int getContentLayoutId() {
@@ -400,18 +407,34 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         mSelectFileActionMode = mode;
         View customView = LayoutInflater.from(getActivity()).inflate(R.layout.custom_select_action_mode_layout, null);
-        Button selectAllBtn = customView.findViewById(R.id.id_select_all_btn);
-        Button selectCancleBtn = customView.findViewById(R.id.id_cancel_select_btn);
-        selectAllBtn.setOnClickListener(this);
-        selectCancleBtn.setOnClickListener(this);
+        mSelectAllBtn = customView.findViewById(R.id.id_select_all_btn);
+        mSelectCancelBtn = customView.findViewById(R.id.id_cancel_select_btn);
+        mSelectAllBtn.setOnClickListener(this);
+        mSelectCancelBtn.setOnClickListener(this);
+
         mSelectedCountTv = customView.findViewById(R.id.id_selected_count_tv);
         mode.setCustomView(customView);
+
+        //显示每个item的多选的小圆点
+        mFileListAdapter.updateFileList(mFileList, true, null);
         return true;
     }
 
     @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-
+        if (mCheckedPos.contains(position)){
+            mCheckedPos.remove(position);
+        }else{
+            mCheckedPos.add(position);
+        }
+        if (mCheckedPos.size() == mFileListAdapter.getCount()){
+            //全选模式下改为全不选
+            mSelectAllBtn.setText(R.string.str_unchecked_all);
+        }else{
+            mSelectAllBtn.setText(R.string.str_check_all);
+        }
+        mFileListAdapter.updateFileList(mFileList, true, mCheckedPos);
+        mSelectedCountTv.setText(String.format(getString(R.string.str_checked_count), mCheckedPos.size()));
     }
 
     @Override
@@ -421,7 +444,6 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
         //当菜单项被点击时
         return false;
     }
@@ -430,14 +452,33 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
     public void onDestroyActionMode(ActionMode mode) {
         //清除多选状态
         mFileListView.clearChoices();
+        mCheckedPos.clear();
+        mFileListAdapter.updateFileList(mFileList, false, null);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.id_select_all_btn:
+                Button button = (Button)v;
+                if (mCheckedPos.size() == mFileListAdapter.getCount()){
+                    //当前处于全选状态,点击之后应该取消全选状态
+                    mFileListAdapter.updateFileList(mFileList, true, null);
+                    mCheckedPos.clear();
+                    button.setText(R.string.str_check_all);
+                }else{
+                    mCheckedPos.clear();
+                    for (int i = 0; i < mFileListAdapter.getCount(); i++) {
+                        //mFileListView.setItemChecked(i, true);
+                        mCheckedPos.add(i);
+                    }
+                    mFileListAdapter.updateFileList(mFileList, true, mCheckedPos);
+                    button.setText(R.string.str_unchecked_all);
+                }
+                mSelectedCountTv.setText(String.format(getString(R.string.str_checked_count), mCheckedPos.size()));
                 break;
             case R.id.id_cancel_select_btn:
+                //关闭ActionMode
                 mSelectFileActionMode.finish();
                 break;
             default:

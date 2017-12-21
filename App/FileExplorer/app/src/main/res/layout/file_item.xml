@@ -64,5 +64,7 @@
         android:button="@null"
         android:background="@drawable/hcheckbox_style_selector"
         android:layout_margin="@dimen/len_20"
+        android:clickable="false"
+        android:focusable="false"
         android:visibility="gone"/>
 </RelativeLayout>
