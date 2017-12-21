@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.codekong.fileexplorer.R;
+import com.codekong.fileexplorer.fragment.CloudFileFragment;
 import com.codekong.fileexplorer.fragment.FileCategoryFragment;
 import com.codekong.fileexplorer.fragment.FileListFragment;
 
@@ -14,21 +15,25 @@ import com.codekong.fileexplorer.fragment.FileListFragment;
  */
 
 public class SwitchViewPagerAdapter extends FragmentPagerAdapter {
-    private String[] mTabName = new String[2];
+    private String[] mTabName = new String[3];
     public SwitchViewPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
         mTabName[0] = context.getString(R.string.str_category);
         mTabName[1] = context.getString(R.string.str_phone);
+        mTabName[2] = context.getString(R.string.str_network_disk);
     }
 
     @Override
     public Fragment getItem(int position) {
-        int currentPosition = 0;
         if (position == 1){
-            currentPosition = 1;
             return new FileListFragment();
         }
-        currentPosition = 0;
+        if (position == 2){
+            return new CloudFileFragment();
+        }
+        if (position == 0){
+            return new FileCategoryFragment();
+        }
         return new FileCategoryFragment();
     }
 

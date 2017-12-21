@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FileExplorer</string>
+    <string name="app_name">私人云盘</string>
     <string name="str_search">搜索</string>
     <string name="str_new_folder">新建文件夹</string>
     <string name="str_copy">复制</string>
@@ -32,4 +32,5 @@
     <string name="str_check_all">全选</string>
     <string name="str_unchecked_all">全不选</string>
     <string name="str_checked_count">当前选中%d项</string>
+    <string name="str_network_disk">网盘</string>
 </resources>
