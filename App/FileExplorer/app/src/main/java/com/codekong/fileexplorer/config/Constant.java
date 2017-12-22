@@ -32,6 +32,8 @@ public class Constant {
     "ic_apk", "ic_zip"};
     /*************************文件分类****************************/
 
+    //tab页面的标题
+
     //每种类型的文件包含的后缀
     public static final Map<String, Set<String>> CATEGORY_SUFFIX;
 
@@ -76,5 +78,4 @@ public class Constant {
         set.add("7z");
         CATEGORY_SUFFIX.put("zip", set);
     }
-
 }

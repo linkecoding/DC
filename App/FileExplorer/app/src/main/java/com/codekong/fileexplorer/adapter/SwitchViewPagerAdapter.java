@@ -1,49 +1,40 @@
 package com.codekong.fileexplorer.adapter;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
 
-import com.codekong.fileexplorer.R;
-import com.codekong.fileexplorer.fragment.CloudFileFragment;
-import com.codekong.fileexplorer.fragment.FileCategoryFragment;
-import com.codekong.fileexplorer.fragment.FileListFragment;
+import java.util.List;
 
 /**
  * Created by szh on 2017/2/9.
  */
 
-public class SwitchViewPagerAdapter extends FragmentPagerAdapter {
-    private String[] mTabName = new String[3];
-    public SwitchViewPagerAdapter(Context context, FragmentManager fm) {
+public class SwitchViewPagerAdapter extends FragmentStatePagerAdapter {
+    private static final String TAG = "SwitchViewPagerAdapter";
+
+    private List<String> mTabNameList;
+    private List<Fragment> mFragmentList;
+    public SwitchViewPagerAdapter(FragmentManager fm, List<Fragment> fragmentList, List<String> tabNameList) {
         super(fm);
-        mTabName[0] = context.getString(R.string.str_category);
-        mTabName[1] = context.getString(R.string.str_phone);
-        mTabName[2] = context.getString(R.string.str_network_disk);
+        this.mTabNameList = tabNameList;
+        this.mFragmentList = fragmentList;
     }
 
     @Override
     public Fragment getItem(int position) {
-        if (position == 1){
-            return new FileListFragment();
-        }
-        if (position == 2){
-            return new CloudFileFragment();
-        }
-        if (position == 0){
-            return new FileCategoryFragment();
-        }
-        return new FileCategoryFragment();
+        Log.e(TAG, "getItem: " + position);
+        return mFragmentList.get(position);
     }
 
     @Override
     public int getCount() {
-        return mTabName.length;
+        return mFragmentList.size();
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return mTabName[position];
+        return mTabNameList.get(position);
     }
 }
