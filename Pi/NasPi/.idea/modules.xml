@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NasPi.iml" filepath="$PROJECT_DIR$/.idea/modules/NasPi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NasPi_main.iml" filepath="$PROJECT_DIR$/.idea/modules/NasPi_main.iml" group="NasPi" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/NasPi_test.iml" filepath="$PROJECT_DIR$/.idea/modules/NasPi_test.iml" group="NasPi" />
+    </modules>
+  </component>
+</project>
