@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_socket.io-java-client" default="compile.module.socket.io-java-client">
+  <dirname property="module.socket.io-java-client.basedir" file="${ant.file.module_socket.io-java-client}"/>
+  
+  <property name="module.jdk.home.socket.io-java-client" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.socket.io-java-client" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.socket.io-java-client" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.socket.io-java-client" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="socket.io-java-client.output.dir" value="${module.socket.io-java-client.basedir}/bin"/>
+  <property name="socket.io-java-client.testoutput.dir" value="${module.socket.io-java-client.basedir}/out/test/socket.io-java-client"/>
+  
+  <path id="socket.io-java-client.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="socket.io-java-client.module.production.classpath">
+    <path refid="${module.jdk.classpath.socket.io-java-client}"/>
+    <pathelement location="${idea.home}/lib/junit-4.12.jar"/>
+    <pathelement location="${basedir}/libs/json-org.jar"/>
+    <path refid="library.java_websocket.classpath"/>
+  </path>
+  
+  <path id="socket.io-java-client.runtime.production.module.classpath">
+    <pathelement location="${socket.io-java-client.output.dir}"/>
+    <pathelement location="${idea.home}/lib/junit-4.12.jar"/>
+    <pathelement location="${basedir}/libs/json-org.jar"/>
+    <path refid="library.java_websocket.classpath"/>
+  </path>
+  
+  <path id="socket.io-java-client.module.classpath">
+    <pathelement location="${socket.io-java-client.output.dir}"/>
+    <path refid="${module.jdk.classpath.socket.io-java-client}"/>
+    <pathelement location="${idea.home}/lib/junit-4.12.jar"/>
+    <pathelement location="${basedir}/libs/json-org.jar"/>
+    <path refid="library.java_websocket.classpath"/>
+  </path>
+  
+  <path id="socket.io-java-client.runtime.module.classpath">
+    <pathelement location="${socket.io-java-client.testoutput.dir}"/>
+    <pathelement location="${socket.io-java-client.output.dir}"/>
+    <pathelement location="${idea.home}/lib/junit-4.12.jar"/>
+    <pathelement location="${basedir}/libs/json-org.jar"/>
+    <path refid="library.java_websocket.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.socket.io-java-client">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.socket.io-java-client">
+    <patternset refid="excluded.from.module.socket.io-java-client"/>
+  </patternset>
+  
+  <path id="socket.io-java-client.module.sourcepath">
+    <dirset dir="${module.socket.io-java-client.basedir}">
+      <include name="src"/>
+      <include name="examples"/>
+      <include name="tests"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.socket.io-java-client" depends="compile.module.socket.io-java-client.production,compile.module.socket.io-java-client.tests" description="Compile module socket.io-java-client"/>
+  
+  <target name="compile.module.socket.io-java-client.production" depends="register.custom.compilers" description="Compile module socket.io-java-client; production classes">
+    <mkdir dir="${socket.io-java-client.output.dir}"/>
+    <javac2 destdir="${socket.io-java-client.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.socket.io-java-client}/javac">
+      <compilerarg line="${compiler.args.socket.io-java-client}"/>
+      <bootclasspath refid="socket.io-java-client.module.bootclasspath"/>
+      <classpath refid="socket.io-java-client.module.production.classpath"/>
+      <src refid="socket.io-java-client.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.socket.io-java-client"/>
+    </javac2>
+    
+    <copy todir="${socket.io-java-client.output.dir}">
+      <fileset dir="${module.socket.io-java-client.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.socket.io-java-client.basedir}/examples">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.socket.io-java-client.basedir}/tests">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.socket.io-java-client.tests" depends="register.custom.compilers,compile.module.socket.io-java-client.production" description="compile module socket.io-java-client; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.socket.io-java-client" description="cleanup module">
+    <delete dir="${socket.io-java-client.output.dir}"/>
+    <delete dir="${socket.io-java-client.testoutput.dir}"/>
+  </target>
+</project>

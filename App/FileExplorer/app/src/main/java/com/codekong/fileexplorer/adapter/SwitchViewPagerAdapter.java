@@ -3,7 +3,6 @@ package com.codekong.fileexplorer.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
 
 import java.util.List;
 
@@ -24,7 +23,6 @@ public class SwitchViewPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Log.e(TAG, "getItem: " + position);
         return mFragmentList.get(position);
     }
 
