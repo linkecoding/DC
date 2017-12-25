@@ -28,9 +28,9 @@ public class File implements Serializable{
     @Id
     @PrimaryKeyJoinColumn
     //主键生产存储的类型是UUID
-    @GeneratedValue(generator = "uuid")
+    @GeneratedValue(generator = "assignGen")
     //设置uuid的生成器为uuid2,uuid2是常规的UUID toString
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @GenericGenerator(name = "assignGen", strategy = "assigned")
     //该列不允许更改,不允许为空
     @Column(updatable = false, nullable = false)
     private String id;
@@ -53,7 +53,7 @@ public class File implements Serializable{
 
     //父级目录Id
     @Column(nullable = false)
-    private int parentId;
+    private String parentId;
 
     //文件大小
     @Column(nullable = false, updatable = false)
@@ -99,11 +99,11 @@ public class File implements Serializable{
         this.level = level;
     }
 
-    public int getParentId() {
+    public String getParentId() {
         return parentId;
     }
 
-    public void setParentId(int parentId) {
+    public void setParentId(String parentId) {
         this.parentId = parentId;
     }
 
