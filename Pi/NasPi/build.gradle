@@ -14,4 +14,6 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation 'log4j:log4j:1.2.17'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.2.0' +
+            ''
 }

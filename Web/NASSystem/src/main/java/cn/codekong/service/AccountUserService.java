@@ -10,17 +10,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import cn.codekong.bean.api.account.AccountRspModel;
-import cn.codekong.bean.api.account.LoginModel;
-import cn.codekong.bean.api.account.RegisterModel;
+import cn.codekong.bean.api.android.account.AccountRspModel;
+import cn.codekong.bean.api.android.account.LoginModel;
+import cn.codekong.bean.api.android.account.RegisterModel;
 import cn.codekong.bean.api.base.ResponseModel;
 import cn.codekong.bean.db.User;
 import cn.codekong.factory.UserFactory;
 
-
 // 127.0.0.1/api/account/...
-@Path("/account")
-public class AccountService extends BaseService {
+@Path("/android/account")
+public class AccountUserService extends BaseUserService {
     // 登录
     @POST
     @Path("/login")

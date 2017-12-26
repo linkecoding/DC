@@ -40,6 +40,10 @@ public class ResponseModel<M> implements Serializable {
     //没有权限操作
     public static final int ERROR_ACCOUNT_NO_PERMISSION = 2010;
 
+
+    //设备没有激活
+    public static final int ERROR_DEVICE_NOT_ACTIVE = 6000;
+
     @Expose
     private int code;
     @Expose
@@ -148,5 +152,9 @@ public class ResponseModel<M> implements Serializable {
 
     public static <M> ResponseModel<M> buildCreateError(int type) {
         return new ResponseModel<M>(type, "Create failed.");
+    }
+
+    public static <M> ResponseModel<M> buildDeviceNotActive(){
+        return new ResponseModel<M>(ERROR_DEVICE_NOT_ACTIVE, "device is not active.");
     }
 }

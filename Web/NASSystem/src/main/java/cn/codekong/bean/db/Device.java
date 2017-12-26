@@ -3,6 +3,7 @@ package cn.codekong.bean.db;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,9 +25,10 @@ import javax.persistence.Table;
  */
 
 @Entity
-@Table(name = "TB_DEVICE")
-public class Device implements Serializable{
-    public Device(){}
+@Table(name = "T_DEVICE")
+public class Device implements Serializable, Principal {
+    public Device() {
+    }
 
     private static final String DEFAULT_DEVICE_NAME = "设备";
 

@@ -1,4 +1,4 @@
-package cn.codekong.bean.api.account;
+package cn.codekong.bean.api.android.account;
 
 import com.google.gson.annotations.Expose;
 

@@ -44,7 +44,7 @@
         <property name="format_sql">true</property>
 
         <!-- 自动更新数据库的级别 -->
-        <property name="hbm2ddl.auto">create</property>
+        <property name="hbm2ddl.auto">update</property>
         <!--
         create：表示启动的时候先drop，再create
         create-drop: 也表示创建，只不过在系统关闭前执行一下drop

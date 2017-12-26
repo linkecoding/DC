@@ -102,7 +102,7 @@ public class FileUtil {
         //记录下来便于后面使用
         String rootDirId = UUID.randomUUID().toString();
         FileCard fileCard = new FileCard(rootDirId, file.getName(), TYPE_FILE,
-                "", fileLevel++, getFileSize(file), "");
+                "", fileLevel++, getFileSize(file), "0");
         fileCardList.add(fileCard);
         //如果给定的路径是文件
         if (file.isFile()){

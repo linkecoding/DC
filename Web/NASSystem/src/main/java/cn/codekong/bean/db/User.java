@@ -27,7 +27,7 @@ import javax.persistence.Table;
  * 用户Model
  */
 @Entity
-@Table(name = "DB_USER")
+@Table(name = "T_USER")
 public class User implements Principal, Serializable {
     public User() {
     }
@@ -71,7 +71,7 @@ public class User implements Principal, Serializable {
     //定义为懒加载,默认加载User信息的时候,并不查询这个集合
     @LazyCollection(LazyCollectionOption.EXTRA)
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "TB_USER_DEVICE", joinColumns = {@JoinColumn(name = "userId")},
+    @JoinTable(name = "T_USER_DEVICE", joinColumns = {@JoinColumn(name = "userId")},
             inverseJoinColumns = {@JoinColumn(name = "deviceId")})
     private Set<Device> devices = new HashSet<>();
 

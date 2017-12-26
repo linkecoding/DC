@@ -8,7 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import cn.codekong.bean.db.User;
+import cn.codekong.bean.db.Device;
 
 /**
  * Created by 尚振鸿 on 17-12-11. 21:20
@@ -47,10 +47,11 @@ public class TestHib {
 
     @Test
     public void testHib(){
-        User user = new User();
-        user.setName("小龙");
-        user.setEmail("szh@codekong.cn");
-        user.setPassword("1234");
+        Device device = new Device();
+        device.setName("设备一号");
+        device.setStatus(1);
+        device.setActiveCode("abcdef");
+        mSession.save(device);
     }
 
 

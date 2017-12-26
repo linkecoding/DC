@@ -11,6 +11,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
  * OkHttp工具类
@@ -25,6 +26,8 @@ public class OkHttpUtil {
 
     //单例模式
     private OkHttpUtil(){
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
         mOkHttpClient = new OkHttpClient();
     }
 

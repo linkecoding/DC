@@ -20,7 +20,7 @@ import javax.persistence.Table;
  */
 
 @Entity
-@Table(name = "TB_FILE")
+@Table(name = "T_FILE")
 public class File implements Serializable{
     public File(){}
 
@@ -44,7 +44,7 @@ public class File implements Serializable{
     private int type;
 
     //文件后缀
-    @Column(length = 8)
+    @Column(length = 8, nullable = true)
     private String suffix;
 
     //文件层级(便于目录跳转)
@@ -56,8 +56,17 @@ public class File implements Serializable{
     private String parentId;
 
     //文件大小
-    @Column(nullable = false, updatable = false)
+    @Column()
     private String size;
+
+    @Column(nullable = false)
+    private String deviceId;
+
+    //定义为创建时间戳,在创建时已经写入
+    @CreationTimestamp
+    @Column(nullable = false)
+
+    private LocalDateTime createAt = LocalDateTime.now();
 
     public String getId() {
         return id;
@@ -123,11 +132,11 @@ public class File implements Serializable{
         this.createAt = createAt;
     }
 
-    //定义为创建时间戳,在创建时已经写入
-    @CreationTimestamp
-    @Column(nullable = false)
+    public String getDeviceId() {
+        return deviceId;
+    }
 
-    private LocalDateTime createAt = LocalDateTime.now();
-
-
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
 }
