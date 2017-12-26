@@ -12,9 +12,9 @@ import android.widget.ImageView;
 import com.codekong.fileexplorer.R;
 import com.codekong.fileexplorer.adapter.SwitchViewPagerAdapter;
 import com.codekong.fileexplorer.base.BaseActivity;
-import com.codekong.fileexplorer.fragment.CloudFileFragment;
+import com.codekong.fileexplorer.fragment.CloudFileListFragment;
 import com.codekong.fileexplorer.fragment.FileCategoryFragment;
-import com.codekong.fileexplorer.fragment.FileListFragment;
+import com.codekong.fileexplorer.fragment.LocalFileListFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,8 +64,8 @@ public class MainActivity extends BaseActivity {
         tabNameList.add("手机");
         tabNameList.add("网盘");
         fragmentList.add(new FileCategoryFragment());
-        fragmentList.add(new FileListFragment());
-        fragmentList.add(new CloudFileFragment());
+        fragmentList.add(new LocalFileListFragment());
+        fragmentList.add(new CloudFileListFragment());
         SwitchViewPagerAdapter switchViewPagerAdapter = new SwitchViewPagerAdapter(getSupportFragmentManager(), fragmentList, tabNameList);
         mSwitchViewPager.setAdapter(switchViewPagerAdapter);
         mSwitchViewPager.setOffscreenPageLimit(2);

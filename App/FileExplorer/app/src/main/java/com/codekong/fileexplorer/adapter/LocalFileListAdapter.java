@@ -24,13 +24,13 @@ import butterknife.ButterKnife;
  * Created by szh on 2017/2/8.
  */
 
-public class FileListAdapter extends BaseAdapter {
+public class LocalFileListAdapter extends BaseAdapter {
     private Context mContext;
     private List<File> mFileList;
     private boolean isMultiChoiceMode;
     private Set<Integer> mCheckedItemPos;
 
-    public FileListAdapter(Context context, List<File> fileList) {
+    public LocalFileListAdapter(Context context, List<File> fileList) {
         this.mContext = context;
         this.mFileList = fileList;
     }
@@ -117,7 +117,7 @@ public class FileListAdapter extends BaseAdapter {
         updateFileList(fileList, false, null);
     }
 
-    class FileViewHolder {
+    static class FileViewHolder {
         @BindView(R.id.id_file_icon)
         ImageView fileIcon;
         @BindView(R.id.id_file_name)

@@ -27,7 +27,7 @@ import android.widget.Toast;
 
 import com.codekong.fileexplorer.R;
 import com.codekong.fileexplorer.activity.MainActivity;
-import com.codekong.fileexplorer.adapter.FileListAdapter;
+import com.codekong.fileexplorer.adapter.LocalFileListAdapter;
 import com.codekong.fileexplorer.base.BaseFragment;
 import com.codekong.fileexplorer.util.FileUtils;
 import com.codekong.fileexplorer.util.ViewUtils;
@@ -53,9 +53,9 @@ import butterknife.OnClick;
  * 文件列表Fragment
  */
 
-public class FileListFragment extends BaseFragment implements AdapterView.OnItemClickListener,
+public class LocalFileListFragment extends BaseFragment implements AdapterView.OnItemClickListener,
         AdapterView.OnItemLongClickListener, AbsListView.MultiChoiceModeListener, View.OnClickListener {
-    private static final String TAG = "FileListFragment";
+    private static final String TAG = "LocalFileListFragment";
     
     @BindView(R.id.id_start_search)
     TextView mStartSearch;
@@ -73,7 +73,7 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
     //文件列表List
     private ArrayList<File> mFileList = new ArrayList<>();
     //文件ListView适配器
-    private FileListAdapter mFileListAdapter;
+    private LocalFileListAdapter mLocalFileListAdapter;
     //当前的文件路径堆栈
     private Stack<String> mNowPathStack;
 
@@ -110,28 +110,28 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
         moreOperationView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final OperationMenuPopupWindow operationMenuPopupWindow = new OperationMenuPopupWindow(FileListFragment.this);
+                final OperationMenuPopupWindow operationMenuPopupWindow = new OperationMenuPopupWindow(LocalFileListFragment.this);
                 operationMenuPopupWindow.showAtLocation(actionBarView, Gravity.TOP, 0, 0);
                 operationMenuPopupWindow.setOnWindowItemClickListener(new OperationMenuPopupWindow.OnWindowItemClickListener() {
                     @Override
                     public void closeMenu() {
-                        FileListFragment.this.closeMenu(operationMenuPopupWindow);
+                        LocalFileListFragment.this.closeMenu(operationMenuPopupWindow);
                     }
 
                     @Override
                     public void sort(String path) {
-                        FileListFragment.this.closeMenu(operationMenuPopupWindow);
+                        LocalFileListFragment.this.closeMenu(operationMenuPopupWindow);
                         showSortMethodMenu();
                     }
 
                     @Override
                     public void newFolder(final String path) {
-                        FileListFragment.this.newFolder(path, operationMenuPopupWindow);
+                        LocalFileListFragment.this.newFolder(path, operationMenuPopupWindow);
                     }
 
                     @Override
                     public void showHideFolder(String path, boolean showHideFile) {
-                        FileListFragment.this.closeMenu(operationMenuPopupWindow);
+                        LocalFileListFragment.this.closeMenu(operationMenuPopupWindow);
                         notifyDataChange(FileUtils.filterSortFileByName(path, !showHideFile));
                     }
                 });
@@ -153,8 +153,8 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
         fileNowPath = FileUtils.getNowStackPathString(mNowPathStack);
         //设置文件路径显示
         mNowFilePathTv.setText(fileNowPath);
-        mFileListAdapter = new FileListAdapter(this.getContext(), mFileList);
-        mFileListView.setAdapter(mFileListAdapter);
+        mLocalFileListAdapter = new LocalFileListAdapter(this.getContext(), mFileList);
+        mFileListView.setAdapter(mLocalFileListAdapter);
         mFileListView.setOnItemClickListener(this);
         mFileListView.setOnItemLongClickListener(this);
         //设置没有item显示时默认显示的图标
@@ -255,7 +255,7 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
                     public void run() {
                         mFileList.clear();
                         mFileList.addAll(Arrays.asList(mFilesArray));
-                        mFileListAdapter.updateFileList(mFileList);
+                        mLocalFileListAdapter.updateFileList(mFileList);
                         //刷新完成
                         mPullToRefreshLayout.finishRefresh();
                     }
@@ -271,7 +271,7 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
         mFilesArray = fileArray;
         mFileList.clear();
         mFileList.addAll(Arrays.asList(mFilesArray));
-        mFileListAdapter.updateFileList(mFileList);
+        mLocalFileListAdapter.updateFileList(mFileList);
     }
 
     /**
@@ -280,19 +280,19 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
      * @param operationMenuPopupWindow
      */
     private void newFolder(final String path, OperationMenuPopupWindow operationMenuPopupWindow) {
-        FileListFragment.this.closeMenu(operationMenuPopupWindow);
+        LocalFileListFragment.this.closeMenu(operationMenuPopupWindow);
         final View view = (LinearLayout) getLayoutInflater().inflate(R.layout.input_layout, null);
         //新文件名输入框
         final EditText et = view.findViewById(R.id.id_input_ed);
         //自定义弹出框标题
-        final TextView titleTv = new TextView(FileListFragment.this.getContext());
-        titleTv.setText(FileListFragment.this.getString(R.string.str_new_folder));
+        final TextView titleTv = new TextView(LocalFileListFragment.this.getContext());
+        titleTv.setText(LocalFileListFragment.this.getString(R.string.str_new_folder));
         titleTv.setTextSize(16);
         titleTv.setGravity(Gravity.CENTER_HORIZONTAL);
-        new AlertDialog.Builder(FileListFragment.this.getActivity())
+        new AlertDialog.Builder(LocalFileListFragment.this.getActivity())
                 .setView(view)
                 .setCancelable(false)
-                .setPositiveButton(FileListFragment.this.getString(R.string.str_new_create), new DialogInterface.OnClickListener() {
+                .setPositiveButton(LocalFileListFragment.this.getString(R.string.str_new_create), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (!TextUtils.isEmpty(et.getText())) {
@@ -312,7 +312,7 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
                         }
                     }
                 })
-                .setNegativeButton(FileListFragment.this.getString(R.string.str_cancel), null)
+                .setNegativeButton(LocalFileListFragment.this.getString(R.string.str_cancel), null)
                 .show();
     }
 
@@ -329,32 +329,32 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
         sortMenuPopupWindow.setOnSortItemClickListener(new SortMenuPopupWindow.OnSortItemClickListener() {
             @Override
             public void closeMenu() {
-                FileListFragment.this.closeMenu(sortMenuPopupWindow);
+                LocalFileListFragment.this.closeMenu(sortMenuPopupWindow);
             }
 
             @Override
             public void sortByName(String path) {
-                FileListFragment.this.closeMenu(sortMenuPopupWindow);
+                LocalFileListFragment.this.closeMenu(sortMenuPopupWindow);
                 notifyDataChange(FileUtils.filterSortFileByName(path, true));
             }
 
             @Override
             public void sortBySizeDesc(String path) {
-                FileListFragment.this.closeMenu(sortMenuPopupWindow);
+                LocalFileListFragment.this.closeMenu(sortMenuPopupWindow);
                 //从大到小排序
                 notifyDataChange(FileUtils.filterSortFileBySize(path, true));
             }
 
             @Override
             public void sortBySizeAsc(String path) {
-                FileListFragment.this.closeMenu(sortMenuPopupWindow);
+                LocalFileListFragment.this.closeMenu(sortMenuPopupWindow);
                 //从大到小排序
                 notifyDataChange(FileUtils.filterSortFileBySize(path, false));
             }
 
             @Override
             public void sortByModifyDate(String path) {
-                FileListFragment.this.closeMenu(sortMenuPopupWindow);
+                LocalFileListFragment.this.closeMenu(sortMenuPopupWindow);
                 //从大到小排序
                 notifyDataChange(FileUtils.filterSortFileByLastModifiedTime(path));
             }
@@ -390,7 +390,7 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
      * @param msg
      */
     private void showToast(String msg){
-        Toast.makeText(FileListFragment.this.getContext(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(LocalFileListFragment.this.getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -416,7 +416,7 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
         mode.setCustomView(customView);
 
         //显示每个item的多选的小圆点
-        mFileListAdapter.updateFileList(mFileList, true, null);
+        mLocalFileListAdapter.updateFileList(mFileList, true, null);
         return true;
     }
 
@@ -427,13 +427,13 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
         }else{
             mCheckedPos.add(position);
         }
-        if (mCheckedPos.size() == mFileListAdapter.getCount()){
+        if (mCheckedPos.size() == mLocalFileListAdapter.getCount()){
             //全选模式下改为全不选
             mSelectAllBtn.setText(R.string.str_unchecked_all);
         }else{
             mSelectAllBtn.setText(R.string.str_check_all);
         }
-        mFileListAdapter.updateFileList(mFileList, true, mCheckedPos);
+        mLocalFileListAdapter.updateFileList(mFileList, true, mCheckedPos);
         mSelectedCountTv.setText(String.format(getString(R.string.str_checked_count), mCheckedPos.size()));
     }
 
@@ -453,7 +453,7 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
         //清除多选状态
         mFileListView.clearChoices();
         mCheckedPos.clear();
-        mFileListAdapter.updateFileList(mFileList, false, null);
+        mLocalFileListAdapter.updateFileList(mFileList, false, null);
     }
 
     @Override
@@ -461,18 +461,18 @@ public class FileListFragment extends BaseFragment implements AdapterView.OnItem
         switch (v.getId()){
             case R.id.id_select_all_btn:
                 Button button = (Button)v;
-                if (mCheckedPos.size() == mFileListAdapter.getCount()){
+                if (mCheckedPos.size() == mLocalFileListAdapter.getCount()){
                     //当前处于全选状态,点击之后应该取消全选状态
-                    mFileListAdapter.updateFileList(mFileList, true, null);
+                    mLocalFileListAdapter.updateFileList(mFileList, true, null);
                     mCheckedPos.clear();
                     button.setText(R.string.str_check_all);
                 }else{
                     mCheckedPos.clear();
-                    for (int i = 0; i < mFileListAdapter.getCount(); i++) {
+                    for (int i = 0; i < mLocalFileListAdapter.getCount(); i++) {
                         //mFileListView.setItemChecked(i, true);
                         mCheckedPos.add(i);
                     }
-                    mFileListAdapter.updateFileList(mFileList, true, mCheckedPos);
+                    mLocalFileListAdapter.updateFileList(mFileList, true, mCheckedPos);
                     button.setText(R.string.str_unchecked_all);
                 }
                 mSelectedCountTv.setText(String.format(getString(R.string.str_checked_count), mCheckedPos.size()));
