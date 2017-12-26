@@ -22,5 +22,16 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../libs/json-org.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../libs/socketio.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../libs/java_websocket.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
