@@ -8,7 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import cn.codekong.bean.db.Device;
+import cn.codekong.factory.AndroidFileFactory;
 
 /**
  * Created by 尚振鸿 on 17-12-11. 21:20
@@ -47,11 +47,11 @@ public class TestHib {
 
     @Test
     public void testHib(){
-        Device device = new Device();
-        device.setName("设备一号");
-        device.setStatus(1);
-        device.setActiveCode("abcdef");
-        mSession.save(device);
+        //System.out.println(Arrays.toString(AndroidFileFactory.getNextDirList("1a7b7e2f-8380-4295-9931-bf922e5c71a3").toArray()));
+        System.out.println(AndroidFileFactory.getNextDirList("1"));
+
+        //System.out.println(Arrays.toString(AndroidFileFactory.getPreDirList("1a7b7e2f-8380-4295-9931-bf922e5c71a3").toArray()));
+        //System.out.println(Arrays.toString(AndroidFileFactory.getPreDirList("1").toArray()));
     }
 
 

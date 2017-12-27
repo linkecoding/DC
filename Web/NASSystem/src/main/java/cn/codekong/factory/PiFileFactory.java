@@ -14,7 +14,7 @@ import cn.codekong.utils.Hib;
  * mail:szh@codekong.cn
  */
 
-public class FileFactory {
+public class PiFileFactory {
 
     /**
      * 根据设备Id查询设备

@@ -14,7 +14,7 @@ import javax.ws.rs.core.SecurityContext;
 
 import cn.codekong.bean.api.base.ResponseModel;
 import cn.codekong.bean.db.Device;
-import cn.codekong.factory.FileFactory;
+import cn.codekong.factory.PiFileFactory;
 
 /**
  * Created by 尚振鸿 on 17-12-26. 13:51
@@ -49,7 +49,7 @@ public class DeviceRequestFilter implements ContainerRequestFilter {
             requestContext.abortWith(response);
         }
 
-        Device device = FileFactory.findDeviceById(deviceId);
+        Device device = PiFileFactory.findDeviceById(deviceId);
         if (device == null || device.getStatus() != DEVICE_ACTIVE_STATE){
             //设备没有激活
             ResponseModel model = ResponseModel.buildDeviceNotActive();

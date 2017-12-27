@@ -139,4 +139,19 @@ public class File implements Serializable{
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
     }
+
+    @Override
+    public String toString() {
+        return "File{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                ", suffix='" + suffix + '\'' +
+                ", level=" + level +
+                ", parentId='" + parentId + '\'' +
+                ", size='" + size + '\'' +
+                ", deviceId='" + deviceId + '\'' +
+                ", createAt=" + createAt +
+                '}';
+    }
 }
