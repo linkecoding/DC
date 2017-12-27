@@ -28,7 +28,8 @@ public class OkHttpUtil {
     private OkHttpUtil(){
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
-        mOkHttpClient = new OkHttpClient();
+        mOkHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(logging).build();
     }
 
     private static class SingletonHolder{

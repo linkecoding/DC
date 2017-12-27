@@ -10,7 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import cn.codekong.bean.api.base.ResponseModel;
-import cn.codekong.bean.db.File;
+import cn.codekong.bean.card.FileCard;
 import cn.codekong.factory.AndroidFileFactory;
 
 /**
@@ -27,9 +27,12 @@ public class AndroidFileService extends BaseUserService{
     // 指定请求与返回的相应体为JSON
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseModel<List<File>> getNextDirList(String id) {
-        List<File> fileList = AndroidFileFactory.getNextDirList(id);
-        return ResponseModel.buildOk(fileList);
+    public ResponseModel<List<FileCard>> getNextDirList(String id) {
+        List<FileCard> fileCardList = AndroidFileFactory.getNextDirList(id);
+        if (fileCardList == null){
+            fileCardList = new ArrayList<FileCard>();
+        }
+        return ResponseModel.buildOk(fileCardList);
     }
 
     //获取上级级文件目录列表
@@ -38,12 +41,12 @@ public class AndroidFileService extends BaseUserService{
     // 指定请求与返回的相应体为JSON
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseModel<List<File>> getPreDirList(String parentId) {
-        List<File> fileList = AndroidFileFactory.getPreDirList(parentId);
-        if (fileList == null){
-            fileList = new ArrayList<File>();
+    public ResponseModel<List<FileCard>> getPreDirList(String parentId) {
+        List<FileCard> fileCardList = AndroidFileFactory.getPreDirList(parentId);
+        if (fileCardList == null){
+            fileCardList = new ArrayList<FileCard>();
         }
-        return ResponseModel.buildOk(fileList);
+        return ResponseModel.buildOk(fileCardList);
     }
 }
 

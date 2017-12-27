@@ -24,7 +24,6 @@ public class FileCard {
     //文件父级目录
     private String parentId;
 
-
     public FileCard(String id, String name, int type,
                     String suffix, int level, String size, String parentId) {
         this.id = id;
