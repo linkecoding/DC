@@ -106,42 +106,7 @@ public class CloudFileListFragment extends BaseFragment implements AdapterView.O
      * 从网络请求数据
      */
     public void getNextDirInfoFromNetwork(DirInfoModel model) {
-        Gson gson = new Gson();
-        Map<String, String> headerMap = new HashMap<>(1);
-        headerMap.put(NetConstant.PARAMETER_TOKEN, getToken());
-        //网络请求
-        OkHttpUtil.getInstance().post(NetConstant.BASE_URL + NetConstant.GET_NEXT_DIR_LIST_URL, OkHttpUtil.MEDIA_TYPE_JSON, gson.toJson(model)
-                , headerMap, new RequestCallback() {
-                    @Override
-                    public void onResponse(Response response) {
-                        Gson gson = new Gson();
-                        List<FileCard> fileCardList = new ArrayList<>();
-                        String msg = "";
-                        if (response.isSuccessful() && response.body() != null) {
-                            try {
-                                ResponseModel<List<FileCard>> responseModel = gson.fromJson(response.body().string()
-                                        .replaceAll("\"", "'"), new TypeToken<ResponseModel<List<FileCard>>>() {
-                                }.getType());
-
-                                if (responseModel != null) {
-                                    msg = responseModel.getMessage();
-                                    if (responseModel.isSucceed()) {
-                                        fileCardList = responseModel.getResult();
-                                    }
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        mCloudFileCardList = fileCardList;
-                        setData(fileCardList, msg);
-                    }
-
-                    @Override
-                    public void onFailure() {
-                        //网络错误
-                    }
-                });
+        getDataFromNetwork(model, NetConstant.GET_NEXT_DIR_LIST_URL                                                                                                    );
     }
 
     /**
@@ -207,25 +172,33 @@ public class CloudFileListFragment extends BaseFragment implements AdapterView.O
 
     @OnClick(R.id.id_cloud_file_current_path_tv)
     public void onViewClicked() {
-        if (mCurDirLevel <= 1){
-            return;
-        }
-        DirInfoModel model = new DirInfoModel(mCurParentDirId, "62d5e827-e5aa-457d-b42f-4fe25dcdc124");
-        //返回上级目录
-        backToPreDir(model);
-        mCurFilePath = mCurFilePath.substring(0, mCurFilePath.lastIndexOf("/"));
-        mCurrentPathTv.setText(mCurFilePath);
+        backToPreDir();
     }
 
     /**
      * 返回上级目录
      */
-    private void backToPreDir(DirInfoModel model) {
+    private void backToPreDir() {
+        if (mCurDirLevel <= 1){
+            return;
+        }
+        DirInfoModel model = new DirInfoModel(mCurParentDirId, "62d5e827-e5aa-457d-b42f-4fe25dcdc124");
+        mCurFilePath = mCurFilePath.substring(0, mCurFilePath.lastIndexOf("/"));
+        mCurrentPathTv.setText(mCurFilePath);
+        getDataFromNetwork(model, NetConstant.GET_PRE_DIR_LIST_URL);
+    }
+
+    /**
+     * 从网络获取数据(上级目录和下级目录数据)
+     * @param model
+     * @param requestUrl
+     */
+    private void getDataFromNetwork(DirInfoModel model, String requestUrl) {
         Gson gson = new Gson();
         Map<String, String> headerMap = new HashMap<>(1);
         headerMap.put(NetConstant.PARAMETER_TOKEN, getToken());
         //网络请求
-        OkHttpUtil.getInstance().post(NetConstant.BASE_URL + NetConstant.GET_PRE_DIR_LIST_URL, OkHttpUtil.MEDIA_TYPE_JSON, gson.toJson(model)
+        OkHttpUtil.getInstance().post(NetConstant.BASE_URL + requestUrl, OkHttpUtil.MEDIA_TYPE_JSON, gson.toJson(model)
                 , headerMap, new RequestCallback() {
                     @Override
                     public void onResponse(Response response) {
@@ -257,5 +230,16 @@ public class CloudFileListFragment extends BaseFragment implements AdapterView.O
                         //网络错误
                     }
                 });
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (mCurDirLevel <= 1){
+            //根目录
+            return false;
+        }else{
+            backToPreDir();
+            return true;
+        }
     }
 }
