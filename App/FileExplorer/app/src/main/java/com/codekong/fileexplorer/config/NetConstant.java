@@ -6,6 +6,9 @@ package com.codekong.fileexplorer.config;
  */
 
 public class NetConstant {
+
+    public static final String PARAMETER_TOKEN = "token";
+
     //网络请求url
     public static final String BASE_URL = "http://192.168.43.171:8080/api/android";
 

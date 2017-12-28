@@ -8,6 +8,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import cn.codekong.bean.db.Device;
+import cn.codekong.bean.db.User;
+
 /**
  * Created by 尚振鸿 on 17-12-11. 21:20
  * mail:szh@codekong.cn
@@ -45,6 +51,13 @@ public class TestHib {
 
     @Test
     public void testHib(){
+
+        User user = mSession.load(User.class, "94822e22-df4f-496e-97e9-b570dc97c1a7");
+        Set<Device> deviceSet = new HashSet<>();
+        Device device = mSession.load(Device.class, "62d5e827-e5aa-457d-b42f-4fe25dcdc124");
+        deviceSet.add(device);
+        user.setDevices(deviceSet);
+        mSession.saveOrUpdate(user);
 //        User user = new User();
 //        user.setName("admin");
 //        user.setEmail("123@qq.com");

@@ -2,9 +2,12 @@ package cn.codekong.factory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import cn.codekong.bean.card.FileCard;
+import cn.codekong.bean.db.Device;
 import cn.codekong.bean.db.File;
+import cn.codekong.bean.db.User;
 import cn.codekong.utils.Hib;
 
 /**
@@ -18,22 +21,26 @@ public class AndroidFileFactory {
 
     /**
      * 获取给定目录的下级目录文件列表
-     *
-     * @param id
+     * @param deviceId
+     * @param dirId
      * @return
      */
-    public static List<FileCard> getNextDirList(String id) {
+    public static List<FileCard> getNextDirList(String deviceId, String dirId) {
         List<File> fileList = null;
-        if (ROOT_DIR_ID.equals(id)) {
+        if (ROOT_DIR_ID.equals(dirId)) {
             System.out.println("进入");
             //获取根目录文件夹
             fileList = Hib.query(session -> session
-                    .createQuery("from File where level=:rootLevel")
-                    .setParameter("rootLevel", 1).list());
+                    .createQuery("from File where level=:rootLevel and deviceId=:deviceId order by type desc")
+                    .setParameter("rootLevel", 1)
+                    .setParameter("deviceId", deviceId)
+                    .list());
         } else {
             fileList = Hib.query(session -> session
-                    .createQuery("from File where parentId=:parentId")
-                    .setParameter("parentId", id).list());
+                    .createQuery("from File where parentId=:parentId and deviceId=:deviceId order by type desc")
+                    .setParameter("parentId", dirId)
+                    .setParameter("deviceId", deviceId)
+                    .list());
         }
 
         return fileListToFileCardList(fileList);
@@ -46,7 +53,7 @@ public class AndroidFileFactory {
      * @param parentId
      * @return
      */
-    public static List<FileCard> getPreDirList(String parentId) {
+    public static List<FileCard> getPreDirList(String deviceId, String parentId) {
         List<File> fileList = null;
         fileList = Hib.query(session -> {
             File parentFile = (File) session
@@ -56,13 +63,18 @@ public class AndroidFileFactory {
             if (parentFile == null) {
                 return null;
             } else {
-                return session.createQuery("from File where parentId=:parentId")
+                return session.createQuery("from File where parentId=:parentId order by type desc")
                         .setParameter("parentId", parentFile.getParentId()).list();
             }
         });
         return fileListToFileCardList(fileList);
     }
 
+    /**
+     * 将File的列表转化为fileCard的列表
+     * @param fileList
+     * @return
+     */
     private static List<FileCard> fileListToFileCardList(List<File> fileList) {
         if (fileList == null){
             return null;
@@ -77,4 +89,25 @@ public class AndroidFileFactory {
         }
         return fileCardList;
     }
+
+
+    /**
+     * 检查该用户是否有该设备的访问权限
+     * @param userId
+     * @param deviceId
+     * @return
+     */
+    public static boolean checkUserDevicePermission(String userId, String deviceId){
+        User user = Hib.query(session -> (User) session.createQuery("from User where id=:userId")
+                .setParameter("userId", userId)
+                .uniqueResult());
+        Set<Device> deviceSet = user.getDevices();
+        for (Device device : deviceSet){
+            if (device.getId().equals(deviceId)){
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

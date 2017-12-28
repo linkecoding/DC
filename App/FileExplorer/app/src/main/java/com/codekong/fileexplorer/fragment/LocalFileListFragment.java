@@ -18,6 +18,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -56,7 +57,7 @@ import butterknife.OnClick;
 public class LocalFileListFragment extends BaseFragment implements AdapterView.OnItemClickListener,
         AdapterView.OnItemLongClickListener, AbsListView.MultiChoiceModeListener, View.OnClickListener {
     private static final String TAG = "LocalFileListFragment";
-    
+
     @BindView(R.id.id_start_search)
     TextView mStartSearch;
     @BindView(R.id.id_now_file_path_tv)
@@ -67,6 +68,8 @@ public class LocalFileListFragment extends BaseFragment implements AdapterView.O
     TextView mEmptyView;
     @BindView(R.id.id_file_list_pulltorefresh)
     PullToRefreshLayout mPullToRefreshLayout;
+    @BindView(R.id.id_localfilelist_loading_framelayout)
+    FrameLayout mLocalFilelistLoadingFramelayout;
 
     //文件列表数组
     private File[] mFilesArray;
@@ -98,11 +101,11 @@ public class LocalFileListFragment extends BaseFragment implements AdapterView.O
         super.initWidget(root);
 
         ActionBar actionBar = null;
-        if (getActivity() instanceof MainActivity){
+        if (getActivity() instanceof MainActivity) {
             MainActivity mainActivity = (MainActivity) getActivity();
             actionBar = mainActivity.getSupportActionBar();
         }
-        if (actionBar == null){
+        if (actionBar == null) {
             return;
         }
         final View actionBarView = actionBar.getCustomView();
@@ -159,6 +162,7 @@ public class LocalFileListFragment extends BaseFragment implements AdapterView.O
         mFileListView.setOnItemLongClickListener(this);
         //设置没有item显示时默认显示的图标
         mFileListView.setEmptyView(mEmptyView);
+        mLocalFilelistLoadingFramelayout.setVisibility(View.GONE);
         initEvent();
     }
 
@@ -174,9 +178,9 @@ public class LocalFileListFragment extends BaseFragment implements AdapterView.O
 
             @Override
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (firstVisibleItem != 0){
+                if (firstVisibleItem != 0) {
                     ViewUtils.disablePullToRefresh(mPullToRefreshLayout, false);
-                }else{
+                } else {
                     ViewUtils.disablePullToRefresh(mPullToRefreshLayout, true);
                 }
             }
@@ -204,9 +208,9 @@ public class LocalFileListFragment extends BaseFragment implements AdapterView.O
         if (file.isFile()) {
             //如果是File则打开
             int index = fileName.lastIndexOf(".");
-            String suffix = fileName.subSequence(index +1, fileName.length()).toString().toLowerCase();
+            String suffix = fileName.subSequence(index + 1, fileName.length()).toString().toLowerCase();
             String type = null;
-            if (MimeTypeMap.getSingleton().hasExtension(suffix)){
+            if (MimeTypeMap.getSingleton().hasExtension(suffix)) {
                 type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(suffix);
             }
             if (type == null) {
@@ -230,8 +234,8 @@ public class LocalFileListFragment extends BaseFragment implements AdapterView.O
     @OnClick(R.id.id_now_file_path_tv)
     public void onViewClicked() {
         //点击返回上级目录
-        if (!mNowPathStack.empty()){
-            if (mNowPathStack.peek().equals(Environment.getExternalStorageDirectory().getPath())){
+        if (!mNowPathStack.empty()) {
+            if (mNowPathStack.peek().equals(Environment.getExternalStorageDirectory().getPath())) {
                 return;
             }
             mNowPathStack.pop();
@@ -276,6 +280,7 @@ public class LocalFileListFragment extends BaseFragment implements AdapterView.O
 
     /**
      * 弹出新建文件夹对话框
+     *
      * @param path
      * @param operationMenuPopupWindow
      */
@@ -320,7 +325,7 @@ public class LocalFileListFragment extends BaseFragment implements AdapterView.O
      * 展示排序方式菜单
      */
     private void showSortMethodMenu() {
-        if (getActivity().getWindow() == null){
+        if (getActivity().getWindow() == null) {
             return;
         }
         final View mainActivityView = getActivity().getWindow().getDecorView().getRootView();
@@ -373,10 +378,10 @@ public class LocalFileListFragment extends BaseFragment implements AdapterView.O
     @Override
     public boolean onBackPressed() {
         //当前在根目录
-        if ((Environment.getExternalStorageDirectory().getAbsolutePath()).equals(mNowFilePathTv.getText().toString())){
+        if ((Environment.getExternalStorageDirectory().getAbsolutePath()).equals(mNowFilePathTv.getText().toString())) {
             //不处理返回键
             return false;
-        }else{
+        } else {
             //退到上级目录
             mNowPathStack.pop();
             //刷新目录
@@ -387,9 +392,10 @@ public class LocalFileListFragment extends BaseFragment implements AdapterView.O
 
     /**
      * 展示提示信息
+     *
      * @param msg
      */
-    private void showToast(String msg){
+    private void showToast(String msg) {
         Toast.makeText(LocalFileListFragment.this.getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
@@ -422,15 +428,15 @@ public class LocalFileListFragment extends BaseFragment implements AdapterView.O
 
     @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        if (mCheckedPos.contains(position)){
+        if (mCheckedPos.contains(position)) {
             mCheckedPos.remove(position);
-        }else{
+        } else {
             mCheckedPos.add(position);
         }
-        if (mCheckedPos.size() == mLocalFileListAdapter.getCount()){
+        if (mCheckedPos.size() == mLocalFileListAdapter.getCount()) {
             //全选模式下改为全不选
             mSelectAllBtn.setText(R.string.str_unchecked_all);
-        }else{
+        } else {
             mSelectAllBtn.setText(R.string.str_check_all);
         }
         mLocalFileListAdapter.updateFileList(mFileList, true, mCheckedPos);
@@ -458,18 +464,17 @@ public class LocalFileListFragment extends BaseFragment implements AdapterView.O
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.id_select_all_btn:
-                Button button = (Button)v;
-                if (mCheckedPos.size() == mLocalFileListAdapter.getCount()){
+                Button button = (Button) v;
+                if (mCheckedPos.size() == mLocalFileListAdapter.getCount()) {
                     //当前处于全选状态,点击之后应该取消全选状态
                     mLocalFileListAdapter.updateFileList(mFileList, true, null);
                     mCheckedPos.clear();
                     button.setText(R.string.str_check_all);
-                }else{
+                } else {
                     mCheckedPos.clear();
                     for (int i = 0; i < mLocalFileListAdapter.getCount(); i++) {
-                        //mFileListView.setItemChecked(i, true);
                         mCheckedPos.add(i);
                     }
                     mLocalFileListAdapter.updateFileList(mFileList, true, mCheckedPos);

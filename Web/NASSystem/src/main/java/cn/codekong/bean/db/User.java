@@ -2,8 +2,6 @@ package cn.codekong.bean.db;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import java.io.Serializable;
 import java.security.Principal;
@@ -69,8 +67,7 @@ public class User implements Principal, Serializable {
     private LocalDateTime createAt = LocalDateTime.now();
 
     //定义为懒加载,默认加载User信息的时候,并不查询这个集合
-    @LazyCollection(LazyCollectionOption.EXTRA)
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "T_USER_DEVICE", joinColumns = {@JoinColumn(name = "userId")},
             inverseJoinColumns = {@JoinColumn(name = "deviceId")})
     private Set<Device> devices = new HashSet<>();

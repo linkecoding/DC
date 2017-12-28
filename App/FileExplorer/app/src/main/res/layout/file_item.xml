@@ -44,7 +44,7 @@
         android:layout_marginLeft="@dimen/len_10"
         android:layout_marginStart="@dimen/len_10"
         android:textSize="@dimen/font_12"
-        android:text="创建时间"/>
+        tools:text="创建时间"/>
     <ImageButton
         android:id="@+id/id_next_dir"
         android:layout_width="@dimen/len_40"
