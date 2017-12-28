@@ -17,7 +17,7 @@ public class FileCard {
     private int type;
     //文件后缀
     private String suffix;
-    //文件层级(1-n[最顶层问0])
+    //文件层级(1-n[最顶层为0])
     private int level;
     //文件大小
     private String size;

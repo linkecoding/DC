@@ -8,8 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import cn.codekong.bean.db.User;
-
 /**
  * Created by 尚振鸿 on 17-12-11. 21:20
  * mail:szh@codekong.cn
@@ -47,13 +45,13 @@ public class TestHib {
 
     @Test
     public void testHib(){
-        User user = new User();
-        user.setName("admin");
-        user.setEmail("123@qq.com");
-        user.setPassword("123456");
-        user.setToken("token");
-
-        mSession.save(user);
+//        User user = new User();
+//        user.setName("admin");
+//        user.setEmail("123@qq.com");
+//        user.setPassword("123456");
+//        user.setToken("token");
+//
+//        mSession.save(user);
         //System.out.println(Arrays.toString(AndroidFileFactory.getNextDirList("0").toArray()));
         //System.out.println(Arrays.toString(AndroidFileFactory.getNextDirList("1a7b7e2f-8380-4295-9931-bf922e5c71a3").toArray()));
         //System.out.println(AndroidFileFactory.getNextDirList("1"));

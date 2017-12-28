@@ -4,6 +4,7 @@ import com.codekong.fileexplorer.listener.RequestCallback;
 
 import java.io.IOException;
 import java.util.Map;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -11,7 +12,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
  * OkHttp工具类
@@ -26,10 +26,8 @@ public class OkHttpUtil {
 
     //单例模式
     private OkHttpUtil(){
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
         mOkHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(logging).build();
+                .addInterceptor(new LogInterceptor()).build();
     }
 
     private static class SingletonHolder{

@@ -33,4 +33,5 @@
     <string name="str_unchecked_all">全不选</string>
     <string name="str_checked_count">当前选中%d项</string>
     <string name="str_network_disk">网盘</string>
+    <string name="str_current_file_path">当前路径</string>
 </resources>

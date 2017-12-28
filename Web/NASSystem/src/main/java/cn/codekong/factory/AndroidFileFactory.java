@@ -25,6 +25,7 @@ public class AndroidFileFactory {
     public static List<FileCard> getNextDirList(String id) {
         List<File> fileList = null;
         if (ROOT_DIR_ID.equals(id)) {
+            System.out.println("进入");
             //获取根目录文件夹
             fileList = Hib.query(session -> session
                     .createQuery("from File where level=:rootLevel")

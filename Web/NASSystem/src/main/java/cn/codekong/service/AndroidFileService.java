@@ -2,6 +2,8 @@ package cn.codekong.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -21,6 +23,8 @@ import cn.codekong.factory.AndroidFileFactory;
 
 @Path("/android/file")
 public class AndroidFileService extends BaseUserService{
+    private static final Logger mLogger = Logger.getLogger("AndroidNetwork");
+
     //获取下级文件目录列表
     @POST
     @Path("/getnextdirlist")
@@ -32,6 +36,8 @@ public class AndroidFileService extends BaseUserService{
         if (fileCardList == null){
             fileCardList = new ArrayList<FileCard>();
         }
+
+        mLogger.log(Level.WARNING, ResponseModel.buildOk(fileCardList).toString());
         return ResponseModel.buildOk(fileCardList);
     }
 

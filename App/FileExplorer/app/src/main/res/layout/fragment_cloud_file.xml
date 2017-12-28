@@ -25,7 +25,7 @@
                 android:paddingLeft="@dimen/len_10"
                 android:paddingStart="@dimen/len_10"
                 android:background="@color/colorWhite"
-                tools:text="moer"
+                android:text="@string/str_current_file_path"
                 android:textSize="@dimen/font_14" />
         </FrameLayout>
         <View

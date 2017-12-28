@@ -3,7 +3,6 @@ package cn.codekong.bean.api.base;
 import com.google.gson.annotations.Expose;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * Created by 尚振鸿 on 17-11-27. 20:47
@@ -49,8 +48,6 @@ public class ResponseModel<M> implements Serializable {
     @Expose
     private String message;
     @Expose
-    private LocalDateTime time = LocalDateTime.now();
-    @Expose
     private M result;
 
     public ResponseModel(){
@@ -92,14 +89,6 @@ public class ResponseModel<M> implements Serializable {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public LocalDateTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalDateTime time) {
-        this.time = time;
     }
 
     public M getResult() {
@@ -156,5 +145,14 @@ public class ResponseModel<M> implements Serializable {
 
     public static <M> ResponseModel<M> buildDeviceNotActive(){
         return new ResponseModel<M>(ERROR_DEVICE_NOT_ACTIVE, "device is not active.");
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseModel{" +
+                "code=" + code +
+                ", message='" + message + '\'' +
+                ", result=" + result +
+                '}';
     }
 }

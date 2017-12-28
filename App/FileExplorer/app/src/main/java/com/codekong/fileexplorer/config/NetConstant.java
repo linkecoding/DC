@@ -11,9 +11,7 @@ public class NetConstant {
 
     //获取下级目录信息
     public static final String GET_NEXT_DIR_LIST_URL = "/file/getnextdirlist";
-    public static final String GET_NEXT_DIR_LIST_FORMAT = "{'id': %s}";
 
     //获取上级目录信息
     public static final String GET_PRE_DIR_LIST_URL = "/file/getpredirlist";
-    public static final String GET_PRE_DIR_LIST_FORMAT = "{'parentId': %s}";
 }

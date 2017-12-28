@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jwenfeng.library.pulltorefresh.PullToRefreshLayout;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,7 @@ public class CloudFileListFragment extends BaseFragment implements AdapterView.O
     @Override
     protected void initData() {
         super.initData();
-        getDirInfoFromNetwork("0");
+        getNextDirInfoFromNetwork("0");
         mCloudFileListView.setEmptyView(mNoCloudFileView);
         mCloudFileListView.setOnItemClickListener(this);
     }
@@ -65,21 +66,28 @@ public class CloudFileListFragment extends BaseFragment implements AdapterView.O
     /**
      * 从网络请求数据
      */
-    public void getDirInfoFromNetwork(String id) {
+    public void getNextDirInfoFromNetwork(String id) {
 
         Map<String, String> headerMap = new HashMap<>(1);
         headerMap.put("token", getToken());
         //网络请求
         OkHttpUtil.getInstance().post(NetConstant.BASE_URL + NetConstant.GET_NEXT_DIR_LIST_URL, OkHttpUtil.MEDIA_TYPE_JSON,
-                String.format(NetConstant.GET_NEXT_DIR_LIST_FORMAT, id), headerMap, new RequestCallback() {
+                id, headerMap, new RequestCallback() {
                     @Override
                     public void onResponse(Response response) {
                         Gson gson = new Gson();
                         List<FileCard> fileCardList = new ArrayList<>();
                         if (response.isSuccessful() && response.body() != null){
-                            Log.d(TAG, "onResponse: " + response.body().toString());
-                            ResponseModel<List<FileCard>> responseModel = gson.fromJson(response.body().toString(), new TypeToken<ResponseModel<List<FileCard>>>(){}.getType());
-                            fileCardList = responseModel.getResult();
+                            try {
+                                ResponseModel<List<FileCard>> responseModel = gson.fromJson(response.body().string().replaceAll("\"", "'"), new TypeToken<ResponseModel<List<FileCard>>>(){}.getType());
+                                if (responseModel != null){
+                                    fileCardList = responseModel.getResult();
+                                }else{
+                                    Log.e(TAG, "onResponse:空 ");
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                         setData(fileCardList);
                     }
